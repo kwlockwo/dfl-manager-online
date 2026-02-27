@@ -1,8 +1,37 @@
+# macOS
 .DS_Store
 .DS_Store?
-target
-.idea
-.settings
+
+# Maven
+target/
+*.jar
+*.war
+*.ear
+
+# IDE - IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE - Eclipse / Spring Tools
+.settings/
 .project
 .classpath
 .factorypath
+
+# IDE - VS Code
+.vscode/
+
+# Environment / secrets
+.env
+*.env
+application-local.properties
+application-local.yml
+
+# Claude
+.claude/
+
+# Logs
+*.log
+logs/
