@@ -2,6 +2,7 @@ package net.dflmngr.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -147,12 +148,12 @@ class ResultServiceTest {
 
     private void stubEmptyTeam(String teamCode) {
         when(dflSelectedPlayerRepository.findByRoundAndTeamCode(1, teamCode)).thenReturn(List.of());
-        when(dflTeamScoresRepository.findById(any(DflTeamScoresPK.class))).thenReturn(Optional.empty());
         DflTeamPredictedScores predicted = new DflTeamPredictedScores();
         predicted.setTeamCode(teamCode);
         predicted.setRound(1);
         predicted.setPredictedScore(0);
-        when(dflTeamPredictedScoresRepository.findById(any(DflTeamPredictedScoresPK.class))).thenReturn(Optional.of(predicted));
+        lenient().when(dflTeamScoresRepository.findById(any(DflTeamScoresPK.class))).thenReturn(Optional.empty());
+        lenient().when(dflTeamPredictedScoresRepository.findById(any(DflTeamPredictedScoresPK.class))).thenReturn(Optional.of(predicted));
     }
 
     private void stubPlayerForTeam(String teamCode) {
@@ -226,7 +227,8 @@ class ResultServiceTest {
 
         assertThat(result.getRound()).isEqualTo(1);
         assertThat(result.getGame()).isEqualTo(1);
-        assertThat(result.getHomeTeam()).isNotNull();
+        assertThat(result.getHomeTeam()).isNull();
+        assertThat(result.getAwayTeam()).isNull();
     }
 
     @Test

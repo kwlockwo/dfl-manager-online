@@ -3,6 +3,7 @@ package net.dflmngr.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -67,11 +68,11 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_groupsGamesByRound() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(
             new DflFixture(1, 1, "AAA", "BBB"),
             new DflFixture(1, 2, "CCC", "DDD"),
             new DflFixture(2, 1, "AAA", "CCC")
-        ));
+        )));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of());
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB, teamC, teamD));
         when(dflSelectedPlayerRepository.selectedTeamExists("AAA", 1)).thenReturn(false);
@@ -92,10 +93,10 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_sortedByRoundThenGame() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(
             new DflFixture(1, 2, "CCC", "DDD"),
             new DflFixture(1, 1, "AAA", "BBB")
-        ));
+        )));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of());
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB, teamC, teamD));
         when(dflSelectedPlayerRepository.selectedTeamExists("AAA", 1)).thenReturn(false);
@@ -111,7 +112,7 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_setsScoresWhenBothTeamsHaveScores() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(new DflFixture(1, 1, "AAA", "BBB")));
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(new DflFixture(1, 1, "AAA", "BBB"))));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of(
             makeTeamScore("AAA", 1, 450),
             makeTeamScore("BBB", 1, 380)
@@ -128,7 +129,7 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_noScoresWhenOnlyOneTeamHasScore() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(new DflFixture(1, 1, "AAA", "BBB")));
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(new DflFixture(1, 1, "AAA", "BBB"))));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of(makeTeamScore("AAA", 1, 450)));
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB));
         when(dflSelectedPlayerRepository.selectedTeamExists("AAA", 1)).thenReturn(false);
@@ -142,7 +143,7 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_setsResultsUriWhenBothTeamsSelected() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(new DflFixture(1, 1, "AAA", "BBB")));
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(new DflFixture(1, 1, "AAA", "BBB"))));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of());
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB));
         when(dflSelectedPlayerRepository.selectedTeamExists("AAA", 1)).thenReturn(true);
@@ -155,7 +156,7 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_noResultsUriWhenOnlyHomeTeamSelected() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(new DflFixture(1, 1, "AAA", "BBB")));
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(new DflFixture(1, 1, "AAA", "BBB"))));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of());
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB));
         when(dflSelectedPlayerRepository.selectedTeamExists("AAA", 1)).thenReturn(true);
@@ -168,7 +169,7 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_setsDisplayNamesFromTeamShortName() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(new DflFixture(1, 1, "AAA", "BBB")));
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(new DflFixture(1, 1, "AAA", "BBB"))));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of());
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB));
         when(dflSelectedPlayerRepository.selectedTeamExists("AAA", 1)).thenReturn(false);
@@ -182,7 +183,7 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_returnsEmptyWhenNoFixtures() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of());
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>());
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of());
         when(dflTeamRepository.findAll()).thenReturn(List.of());
 
@@ -191,7 +192,7 @@ class FixtureServiceTest {
 
     @Test
     void getFixtures_setsHomeAndAwayTeamCodes() {
-        when(dflFixtureRepository.findAll()).thenReturn(List.of(new DflFixture(1, 1, "AAA", "BBB")));
+        when(dflFixtureRepository.findAll()).thenReturn(new ArrayList<>(List.of(new DflFixture(1, 1, "AAA", "BBB"))));
         when(dflTeamScoresRepository.findAll()).thenReturn(List.of());
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB));
         when(dflSelectedPlayerRepository.selectedTeamExists("AAA", 1)).thenReturn(false);

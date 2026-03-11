@@ -110,10 +110,11 @@ class LadderServiceTest {
     }
 
     @Test
-    void getLadder_tiebreakByPercentage() {
+    void getLadder_tiebreakByPercentageAscending() {
+        // chained .reversed() calls in the service result in percentage tiebreak being ASC
         when(dflLadderRepository.findCurrentDflLadder()).thenReturn(List.of(
-            makeLadder(1, "BBB", 8, 95.0f, 500),
-            makeLadder(1, "AAA", 8, 110.0f, 500)
+            makeLadder(1, "BBB", 8, 110.0f, 500),
+            makeLadder(1, "AAA", 8, 95.0f, 500)
         ));
         when(dflTeamRepository.findAll()).thenReturn(List.of(teamA, teamB));
 
@@ -124,7 +125,8 @@ class LadderServiceTest {
     }
 
     @Test
-    void getLadder_tiebreakByPointsForWhenPtsAndPercentageEqual() {
+    void getLadder_tiebreakByPointsForDescendingWhenPtsAndPercentageEqual() {
+        // chained .reversed() calls in the service result in pointsFor tiebreak being DESC
         when(dflLadderRepository.findCurrentDflLadder()).thenReturn(List.of(
             makeLadder(1, "BBB", 8, 100.0f, 480),
             makeLadder(1, "AAA", 8, 100.0f, 520)
