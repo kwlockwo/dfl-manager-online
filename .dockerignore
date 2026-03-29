@@ -1,0 +1,7 @@
+.git
+.github
+.githooks
+.vscode
+.idea
+target
+*.md
