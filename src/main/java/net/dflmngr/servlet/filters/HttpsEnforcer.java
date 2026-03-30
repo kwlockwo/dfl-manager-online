@@ -32,7 +32,7 @@ public class HttpsEnforcer implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         if (request.getHeader(X_FORWARDED_PROTO) != null) {
-            if (request.getHeader(X_FORWARDED_PROTO).indexOf("https") != 0) {
+            if (!request.getHeader(X_FORWARDED_PROTO).startsWith("https")) {
                 response.sendRedirect("https://" + request.getServerName() + (request.getPathInfo() == null ? "" : request.getPathInfo()));
                 return;
             }
