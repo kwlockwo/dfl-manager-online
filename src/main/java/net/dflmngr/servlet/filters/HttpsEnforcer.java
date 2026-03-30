@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -23,9 +22,6 @@ public class HttpsEnforcer implements Filter {
     public static final String X_FORWARDED_PROTO = "x-forwarded-proto";
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
-
-    @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
@@ -40,8 +36,5 @@ public class HttpsEnforcer implements Filter {
 
         filterChain.doFilter(request, response);
     }
-
-    @Override
-    public void destroy() {}
 }
 
