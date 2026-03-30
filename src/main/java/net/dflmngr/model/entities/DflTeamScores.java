@@ -5,73 +5,25 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import net.dflmngr.model.entities.keys.DflTeamScoresPK;
 
 @Entity
-@Table(name="dfl_team_scores")
+@Table(name = "dfl_team_scores")
 @IdClass(DflTeamScoresPK.class)
+@Getter @Setter @ToString @EqualsAndHashCode
 public class DflTeamScores {
-	
+
 	@Id
-	@Column(name="team_code")
+	@Column(name = "team_code")
 	private String teamCode;
-	
+
 	@Id
 	private int round;
+
 	private int score;
-	
-	public String getTeamCode() {
-		return teamCode;
-	}
-	public void setTeamCode(String teamCode) {
-		this.teamCode = teamCode;
-	}
-	public int getRound() {
-		return round;
-	}
-	public void setRound(int round) {
-		this.round = round;
-	}
-	public int getScore() {
-		return score;
-	}
-	public void setScore(int score) {
-		this.score = score;
-	}
-	
-	@Override
-	public String toString() {
-		return "DflTeamScores [teamCode=" + teamCode + ", round=" + round + ", score=" + score + "]";
-	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + round;
-		result = prime * result + score;
-		result = prime * result + ((teamCode == null) ? 0 : teamCode.hashCode());
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		DflTeamScores other = (DflTeamScores) obj;
-		if (round != other.round)
-			return false;
-		if (score != other.score)
-			return false;
-		if (teamCode == null) {
-			if (other.teamCode != null)
-				return false;
-		} else if (!teamCode.equals(other.teamCode))
-			return false;
-		return true;
-	}
 }

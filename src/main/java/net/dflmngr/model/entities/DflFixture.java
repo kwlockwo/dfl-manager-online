@@ -5,63 +5,29 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import net.dflmngr.model.entities.keys.DflFixturePK;
 
 @Entity
-@Table(name="dfl_fixture")
+@Table(name = "dfl_fixture")
 @IdClass(DflFixturePK.class)
+@Getter @Setter @ToString @NoArgsConstructor @AllArgsConstructor
 public class DflFixture {
-	
+
 	@Id
 	private int round;
-	
+
 	@Id
 	private int game;
-	
-	@Column(name="home_team")
+
+	@Column(name = "home_team")
 	private String homeTeam;
-	
-	@Column(name="away_team")
+
+	@Column(name = "away_team")
 	private String awayTeam;
-	
-	public DflFixture() {}
-	
-	public DflFixture(int round, int game, String homeTeam, String awayTeam) {
-		this.round = round;
-		this.game = game;
-		this.homeTeam = homeTeam;
-		this.awayTeam = awayTeam;
-	}
-	
-	public int getRound() {
-		return round;
-	}
-	public void setRound(int round) {
-		this.round = round;
-	}
-	public int getGame() {
-		return game;
-	}
-	public void setGame(int game) {
-		this.game = game;
-	}
-	public String getHomeTeam() {
-		return homeTeam;
-	}
-	public void setHomeTeam(String homeTeam) {
-		this.homeTeam = homeTeam;
-	}
-	public String getAwayTeam() {
-		return awayTeam;
-	}
-	public void setAwayTeam(String awayTeam) {
-		this.awayTeam = awayTeam;
-	}
-	
-	@Override
-	public String toString() {
-		return "DflFixture [round=" + round + ", game=" + game + ", homeTeam=" + homeTeam + ", awayTeam=" + awayTeam
-				+ "]";
-	}
 }
