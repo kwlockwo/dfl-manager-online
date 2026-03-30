@@ -9,7 +9,3 @@ spring:
       connection-timeout: 5000
       minimum-idle: 2
       maximum-pool-size: 5
-logging:
-  level:
-    net:
-      dflmngr: ${DFLMNGR_LOG_LEVEL:info}

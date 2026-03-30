@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import net.dflmngr.logging.LoggingUtils;
 
 import net.dflmngr.model.entities.DflFixture;
 import net.dflmngr.model.entities.DflTeam;
@@ -23,7 +23,7 @@ import net.dflmngr.repositories.DflTeamScoresRepository;
 @Service
 public class FixtureService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(FixtureService.class);
+	private final LoggingUtils loggerUtils = new LoggingUtils("FixtureService");
 	
 	private final DflFixtureRepository dflFixtureRepository;
 	private final DflTeamScoresRepository dflTeamScoresRepository;
@@ -59,13 +59,13 @@ public class FixtureService {
 		
 		Comparator<GameFixture> gamesComparator = Comparator.comparingInt(GameFixture::getGame);
 		
-		logger.debug("DFL Fixtures: {}", dflFixtures);
-		logger.debug("DFL Teams: {}", dflTeams);
+		loggerUtils.log("debug", "DFL Fixtures: {}", dflFixtures);
+		loggerUtils.log("debug", "DFL Teams: {}", dflTeams);
 		
 		for(DflFixture dflFixture : dflFixtures) {			
 			GameFixture game = new GameFixture();
 			
-			logger.debug("Round={}, Game={}, Home={}, Away={}", dflFixture.getRound(), dflFixture.getGame(), dflFixture.getHomeTeam(), dflFixture.getAwayTeam());
+			loggerUtils.log("debug", "Round={}, Game={}, Home={}, Away={}", dflFixture.getRound(), dflFixture.getGame(), dflFixture.getHomeTeam(), dflFixture.getAwayTeam());
 			
 			game.setGame(dflFixture.getGame());
 			game.setHomeTeam(dflFixture.getHomeTeam());
@@ -87,10 +87,10 @@ public class FixtureService {
 				game.setResultsUri(resultsUri);
 			}
 			
-			logger.debug("Home team details={}", dflTeams.get(dflFixture.getHomeTeam()));
+			loggerUtils.log("debug", "Home team details={}", dflTeams.get(dflFixture.getHomeTeam()));
 			game.setHomeTeamDisplayName(dflTeams.get(dflFixture.getHomeTeam()).getShortName());
-			
-			logger.debug("Away team details={}", dflTeams.get(dflFixture.getAwayTeam()));
+
+			loggerUtils.log("debug", "Away team details={}", dflTeams.get(dflFixture.getAwayTeam()));
 			game.setAwayTeamDisplayName(dflTeams.get(dflFixture.getAwayTeam()).getShortName());
 			
 			if(currentRound == dflFixture.getRound()) {

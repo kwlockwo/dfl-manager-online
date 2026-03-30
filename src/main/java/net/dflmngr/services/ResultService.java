@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
+import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entities.AflPlayer;
 import net.dflmngr.model.entities.DflFixture;
 import net.dflmngr.model.entities.DflPlayer;
@@ -44,6 +45,8 @@ import net.dflmngr.repositories.RawPlayerStatsRepository;
 
 @Service
 public class ResultService {
+
+	private final LoggingUtils loggerUtils = new LoggingUtils("ResultService");
 
 	private final DflFixtureRepository dflFixtureRepository;
 	private final DflTeamRepository dflTeamRepository;
@@ -88,7 +91,7 @@ public class ResultService {
 			results.setHomeTeam(getTeamResults(round, homeTeamCode));
 			results.setAwayTeam(getTeamResults(round, awayTeamCode));
 		} catch (NoSuchElementException ex) {
-			//should log something.
+			loggerUtils.logException("Fixture not found for round=" + round + " game=" + game, ex);
 		}
 			
 		return results;
