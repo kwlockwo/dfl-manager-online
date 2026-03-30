@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -23,25 +22,17 @@ public class HttpsEnforcer implements Filter {
     public static final String X_FORWARDED_PROTO = "x-forwarded-proto";
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {}
-
-    @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (request.getHeader(X_FORWARDED_PROTO) != null) {
-            if (request.getHeader(X_FORWARDED_PROTO).indexOf("https") != 0) {
-                response.sendRedirect("https://" + request.getServerName() + (request.getPathInfo() == null ? "" : request.getPathInfo()));
-                return;
-            }
+        String proto = request.getHeader(X_FORWARDED_PROTO);
+        if (proto != null && !proto.startsWith("https")) {
+            response.sendRedirect("https://" + request.getServerName() + (request.getPathInfo() == null ? "" : request.getPathInfo()));
+            return;
         }
 
         filterChain.doFilter(request, response);
     }
-
-    @Override
-    public void destroy() {}
 }
-
