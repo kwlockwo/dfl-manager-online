@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entities.DflLadder;
 import net.dflmngr.model.entities.DflTeam;
 import net.dflmngr.model.web.Ladder;
@@ -18,7 +19,7 @@ import net.dflmngr.repositories.DflTeamRepository;
 @Service
 public class LadderService {
 
-	private final LoggingUtils loggerUtils = new LoggingUtils("LadderService");
+	private static final Logger logger = LoggerFactory.getLogger(LadderService.class);
 
 	private final DflLadderRepository dflLadderRepository;
 	private final DflTeamRepository dflTeamRepository;
@@ -29,7 +30,7 @@ public class LadderService {
 	}
 	
 	public List<Ladder> getLadder() {
-		loggerUtils.log("info", "Getting ladder");
+		logger.info("Getting ladder");
 		List<DflLadder> dflLadder = dflLadderRepository.findCurrentDflLadder();
 		List<DflTeam> dflTeamsList = dflTeamRepository.findAll();
 		
@@ -39,7 +40,7 @@ public class LadderService {
 	}
 	
 	public List<Ladder> getLiveLadder() {
-		loggerUtils.log("info", "Getting live ladder");
+		logger.info("Getting live ladder");
 		List<DflLadder> dflLadder = dflLadderRepository.findLiveDflLadder();
 		List<DflTeam> dflTeamsList = dflTeamRepository.findAll();
 		

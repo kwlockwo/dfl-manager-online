@@ -2,7 +2,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%p %m%n%ex</pattern>
+            <pattern>%p [%logger{0}] %m%n%ex</pattern>
         </encoder>
     </appender>
 
@@ -12,25 +12,20 @@
         </http>
         <format>
             <label>
-                <pattern>app=DFLManagerOnline,level=%level,handler=%mdc{handler}</pattern>
+                <pattern>app=DFLManagerOnline,level=%level,handler=%logger{0}</pattern>
             </label>
             <message>
-                <pattern>%p %m%n%ex</pattern>
+                <pattern>%p [%logger{0}] %m%n%ex</pattern>
             </message>
         </format>
+        <enabled>${LOG_TO_LOKI:-false}</enabled>
     </appender>
 
-    <logger name="stdout-logger" level="${DFLMNGR_LOG_LEVEL:-info}" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
+    <springProperty name="logLevel" source="logging.level.net.dflmngr" defaultValue="info"/>
 
-    <logger name="loki-logger" level="${DFLMNGR_LOG_LEVEL:-info}" additivity="false">
+    <root level="${logLevel}">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="LOKI"/>
-    </logger>
-
-    <root level="${DFLMNGR_LOG_LEVEL:-info}">
-        <appender-ref ref="STDOUT"/>
     </root>
 
 </configuration>
