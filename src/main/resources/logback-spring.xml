@@ -1,0 +1,39 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%p [%logger{0}] %m%n%ex</pattern>
+        </encoder>
+    </appender>
+
+    <springProperty name="logLevel" source="logging.level.net.dflmngr" defaultValue="info"/>
+
+    <if condition='isDefined("LOKI_URL")'>
+        <then>
+            <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+                <http>
+                    <url>${LOKI_URL}/loki/api/v1/push</url>
+                </http>
+                <format>
+                    <label>
+                        <pattern>app=DFLManagerOnline,level=%level,handler=%logger{0}</pattern>
+                    </label>
+                    <message>
+                        <pattern>%p [%logger{0}] %m%n%ex</pattern>
+                    </message>
+                </format>
+            </appender>
+
+            <root level="${logLevel}">
+                <appender-ref ref="STDOUT"/>
+                <appender-ref ref="LOKI"/>
+            </root>
+        </then>
+        <else>
+            <root level="${logLevel}">
+                <appender-ref ref="STDOUT"/>
+            </root>
+        </else>
+    </if>
+
+</configuration>
