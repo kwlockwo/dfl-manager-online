@@ -27,14 +27,12 @@ public class HttpsEnforcer implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (request.getHeader(X_FORWARDED_PROTO) != null) {
-            if (!request.getHeader(X_FORWARDED_PROTO).startsWith("https")) {
-                response.sendRedirect("https://" + request.getServerName() + (request.getPathInfo() == null ? "" : request.getPathInfo()));
-                return;
-            }
+        String proto = request.getHeader(X_FORWARDED_PROTO);
+        if (proto != null && !proto.startsWith("https")) {
+            response.sendRedirect("https://" + request.getServerName() + (request.getPathInfo() == null ? "" : request.getPathInfo()));
+            return;
         }
 
         filterChain.doFilter(request, response);
     }
 }
-
