@@ -20,7 +20,7 @@ RUN apt-get update && \
 COPY --from=build_step /build/target/dflmngr-online-1.0-SNAPSHOT.jar app.jar
 
 ARG IS_PULL_REQUEST=false
-ENV ENV_FROM_BUILD=${IS_PULL_REQUEST}
+ENV APP_ENV_FROM_BUILD=${IS_PULL_REQUEST}
 ENV OTEL_SERVICE_NAME=dfl-manager-online
 ENV OTEL_LOGS_EXPORTER=none
 ENV OTEL_METRICS_EXPORTER=none
@@ -29,7 +29,7 @@ ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 
 USER appuser
 CMD ["sh", "-c", \
-     "if [ \"${ENV_FROM_BUILD}\" = \"true\" ]; then export ENV=preview; fi; \
-      BASE_ATTRS=\"app.name=dfl-manager-online,service.instance.id=${RENDER_INSTANCE_ID:-local},deployment.environment=${ENV:-local}\"; \
+     "if [ \"${APP_ENV_FROM_BUILD}\" = \"true\" ]; then export APP_ENV=preview; fi; \
+      BASE_ATTRS=\"app.name=dfl-manager-online,service.instance.id=${RENDER_INSTANCE_ID:-local},deployment.environment=${APP_ENV:-local}\"; \
       export OTEL_RESOURCE_ATTRIBUTES=\"${OTEL_RESOURCE_ATTRIBUTES:+${OTEL_RESOURCE_ATTRIBUTES},}${BASE_ATTRS}\"; \
       exec java -javaagent:/app/opentelemetry-javaagent.jar -jar /app/app.jar"]
