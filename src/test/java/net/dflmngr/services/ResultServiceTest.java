@@ -2,6 +2,8 @@ package net.dflmngr.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -27,8 +29,6 @@ import net.dflmngr.model.entities.DflTeamScores;
 import net.dflmngr.model.entities.Globals;
 import net.dflmngr.model.entities.RawPlayerStats;
 import net.dflmngr.model.entities.keys.DflFixturePK;
-import net.dflmngr.model.entities.keys.DflPlayerPredictedScoresPK;
-import net.dflmngr.model.entities.keys.DflPlayerScoresPK;
 import net.dflmngr.model.entities.keys.DflTeamPredictedScoresPK;
 import net.dflmngr.model.entities.keys.DflTeamScoresPK;
 import net.dflmngr.model.entities.keys.GlobalsPK;
@@ -158,11 +158,13 @@ class ResultServiceTest {
 
     private void stubPlayerForTeam(String teamCode) {
         when(dflSelectedPlayerRepository.findByRoundAndTeamCode(1, teamCode)).thenReturn(List.of(selectedPlayer));
-        when(dflPlayerRepository.findById(101)).thenReturn(Optional.of(player));
-        when(aflPlayerRepository.findByDflPlayerId(101)).thenReturn(aflPlayer);
-        when(rawPlayerStatsRepository.findByRoundAndTeamAndJumperNo(1, "RICH", 5)).thenReturn(rawStats);
-        when(dflPlayerScoresRepository.findById(any(DflPlayerScoresPK.class))).thenReturn(Optional.of(playerScores));
-        when(dflPlayerPredictedScoresRepository.findById(any(DflPlayerPredictedScoresPK.class))).thenReturn(Optional.of(playerPredictedScores));
+        when(dflPlayerRepository.findByPlayerIdIn(anyList())).thenReturn(List.of(player));
+        when(aflPlayerRepository.findByDflPlayerIdIn(anyList())).thenReturn(List.of(aflPlayer));
+        when(rawPlayerStatsRepository.findByRoundAndTeamIn(anyInt(), anyList())).thenReturn(List.of(rawStats));
+        rawStats.setTeam("RICH");
+        rawStats.setJumperNo(5);
+        when(dflPlayerScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of(playerScores));
+        when(dflPlayerPredictedScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of(playerPredictedScores));
     }
 
     @Test
@@ -297,11 +299,11 @@ class ResultServiceTest {
         stubFixtureAndTeams();
 
         when(dflSelectedPlayerRepository.findByRoundAndTeamCode(1, "AAA")).thenReturn(List.of(selectedPlayer));
-        when(dflPlayerRepository.findById(101)).thenReturn(Optional.of(player));
-        when(aflPlayerRepository.findByDflPlayerId(101)).thenReturn(aflPlayer);
-        when(rawPlayerStatsRepository.findByRoundAndTeamAndJumperNo(1, "RICH", 5)).thenReturn(null);
-        when(dflPlayerScoresRepository.findById(any(DflPlayerScoresPK.class))).thenReturn(Optional.empty());
-        when(dflPlayerPredictedScoresRepository.findById(any(DflPlayerPredictedScoresPK.class))).thenReturn(Optional.empty());
+        when(dflPlayerRepository.findByPlayerIdIn(anyList())).thenReturn(List.of(player));
+        when(aflPlayerRepository.findByDflPlayerIdIn(anyList())).thenReturn(List.of(aflPlayer));
+        when(rawPlayerStatsRepository.findByRoundAndTeamIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerPredictedScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
 
         DflTeamPredictedScores awayPredicted = new DflTeamPredictedScores();
         awayPredicted.setRound(1);
@@ -340,11 +342,11 @@ class ResultServiceTest {
 
         stubFixtureAndTeams();
         when(dflSelectedPlayerRepository.findByRoundAndTeamCode(1, "AAA")).thenReturn(List.of(emg));
-        when(dflPlayerRepository.findById(202)).thenReturn(Optional.of(emgPlayer));
-        when(aflPlayerRepository.findByDflPlayerId(202)).thenReturn(emgAflPlayer);
-        when(rawPlayerStatsRepository.findByRoundAndTeamAndJumperNo(1, "MELB", 7)).thenReturn(null);
-        when(dflPlayerScoresRepository.findById(any(DflPlayerScoresPK.class))).thenReturn(Optional.empty());
-        when(dflPlayerPredictedScoresRepository.findById(any(DflPlayerPredictedScoresPK.class))).thenReturn(Optional.empty());
+        when(dflPlayerRepository.findByPlayerIdIn(anyList())).thenReturn(List.of(emgPlayer));
+        when(aflPlayerRepository.findByDflPlayerIdIn(anyList())).thenReturn(List.of(emgAflPlayer));
+        when(rawPlayerStatsRepository.findByRoundAndTeamIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerPredictedScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
 
         DflTeamPredictedScores predicted = new DflTeamPredictedScores();
         predicted.setRound(1);
@@ -382,11 +384,11 @@ class ResultServiceTest {
 
         stubFixtureAndTeams();
         when(dflSelectedPlayerRepository.findByRoundAndTeamCode(1, "AAA")).thenReturn(List.of(emg));
-        when(dflPlayerRepository.findById(202)).thenReturn(Optional.of(emgPlayer));
-        when(aflPlayerRepository.findByDflPlayerId(202)).thenReturn(emgAflPlayer);
-        when(rawPlayerStatsRepository.findByRoundAndTeamAndJumperNo(1, "MELB", 7)).thenReturn(null);
-        when(dflPlayerScoresRepository.findById(any(DflPlayerScoresPK.class))).thenReturn(Optional.empty());
-        when(dflPlayerPredictedScoresRepository.findById(any(DflPlayerPredictedScoresPK.class))).thenReturn(Optional.empty());
+        when(dflPlayerRepository.findByPlayerIdIn(anyList())).thenReturn(List.of(emgPlayer));
+        when(aflPlayerRepository.findByDflPlayerIdIn(anyList())).thenReturn(List.of(emgAflPlayer));
+        when(rawPlayerStatsRepository.findByRoundAndTeamIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerPredictedScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
 
         DflTeamPredictedScores predicted = new DflTeamPredictedScores();
         predicted.setRound(1);
@@ -423,11 +425,11 @@ class ResultServiceTest {
 
         stubFixtureAndTeams();
         when(dflSelectedPlayerRepository.findByRoundAndTeamCode(1, "AAA")).thenReturn(List.of(emg));
-        when(dflPlayerRepository.findById(202)).thenReturn(Optional.of(emgPlayer));
-        when(aflPlayerRepository.findByDflPlayerId(202)).thenReturn(emgAflPlayer);
-        when(rawPlayerStatsRepository.findByRoundAndTeamAndJumperNo(1, "MELB", 7)).thenReturn(null);
-        when(dflPlayerScoresRepository.findById(any(DflPlayerScoresPK.class))).thenReturn(Optional.empty());
-        when(dflPlayerPredictedScoresRepository.findById(any(DflPlayerPredictedScoresPK.class))).thenReturn(Optional.empty());
+        when(dflPlayerRepository.findByPlayerIdIn(anyList())).thenReturn(List.of(emgPlayer));
+        when(aflPlayerRepository.findByDflPlayerIdIn(anyList())).thenReturn(List.of(emgAflPlayer));
+        when(rawPlayerStatsRepository.findByRoundAndTeamIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
+        when(dflPlayerPredictedScoresRepository.findByRoundAndPlayerIdIn(anyInt(), anyList())).thenReturn(List.of());
 
         DflTeamPredictedScores predicted = new DflTeamPredictedScores();
         predicted.setRound(1);
