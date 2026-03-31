@@ -27,6 +27,7 @@ ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 
 USER appuser
 CMD ["sh", "-c", \
-     "BASE_ATTRS=\"app.name=dfl-manager-online,service.instance.id=${RENDER_INSTANCE_ID:-local},deployment.environment=${ENV:-local}\"; \
+     "if [ \"${IS_PULL_REQUEST:-false}\" = \"true\" ]; then export ENV=preview; fi; \
+      BASE_ATTRS=\"app.name=dfl-manager-online,service.instance.id=${RENDER_INSTANCE_ID:-local},deployment.environment=${ENV:-local}\"; \
       export OTEL_RESOURCE_ATTRIBUTES=\"${OTEL_RESOURCE_ATTRIBUTES:+${OTEL_RESOURCE_ATTRIBUTES},}${BASE_ATTRS}\"; \
       exec java -javaagent:/app/opentelemetry-javaagent.jar -jar /app/app.jar"]
