@@ -1,12 +1,12 @@
-FROM maven:3.9-eclipse-temurin-21-jammy AS build_step
+FROM maven:3.9.11-eclipse-temurin-21-alpine AS build_step
 WORKDIR /build
 COPY pom.xml .
 RUN mvn dependency:go-offline -q
 COPY src ./src
 RUN mvn clean package -DskipTests -q
 
-FROM eclipse-temurin:21-jre-jammy
-RUN useradd -r -u 1001 -g root appuser
+FROM eclipse-temurin:21.0.9_10-jre-alpine-3.23
+RUN adduser -S -u 1001 -G root appuser
 WORKDIR /app
 
 RUN apt-get update && \
