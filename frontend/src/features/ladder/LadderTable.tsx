@@ -15,12 +15,6 @@ const DEFAULT_SORT: SortCol[] = [
   { key: 'pointsFor', dir: 'desc' },
 ];
 
-function isDefault(sort: SortCol[]): boolean {
-  return (
-    sort.length === DEFAULT_SORT.length &&
-    sort.every((s, i) => s.key === DEFAULT_SORT[i].key && s.dir === DEFAULT_SORT[i].dir)
-  );
-}
 
 function applySorts(entries: Ladder[], sort: SortCol[]): Ladder[] {
   return [...entries].sort((a, b) => {
@@ -40,8 +34,10 @@ interface Props {
 
 export default function LadderTable({ entries, title, showAverages }: Props) {
   const [sort, setSort] = useState<SortCol[]>(DEFAULT_SORT);
+  const [userSorted, setUserSorted] = useState(false);
 
   const handleSort = (key: SortKey, shiftKey: boolean) => {
+    setUserSorted(true);
     setSort(prev => {
       const existingIndex = prev.findIndex(s => s.key === key);
 
@@ -70,7 +66,7 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
     const index = sort.findIndex(s => s.key === key);
     if (index === -1) return <span className="text-gray-300 ml-0.5">↕</span>;
     const arrow = sort[index].dir === 'desc' ? '↓' : '↑';
-    const badge = sort.length > 1
+    const badge = userSorted && sort.length > 1
       ? <sup className="text-gray-400 text-[9px] ml-0.5">{index + 1}</sup>
       : null;
     return <span className="ml-0.5">{arrow}{badge}</span>;
@@ -84,7 +80,7 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
   };
 
   const sorted = applySorts(entries, sort);
-  const showReset = !isDefault(sort);
+  const showReset = userSorted;
 
   return (
     <div className="mb-6 rounded border border-gray-200 shadow-sm overflow-hidden">
@@ -92,7 +88,7 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
         <span>{title}</span>
         {showReset && (
           <button
-            onClick={() => setSort(DEFAULT_SORT)}
+            onClick={() => { setSort(DEFAULT_SORT); setUserSorted(false); }}
             className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline"
           >
             Reset sort
