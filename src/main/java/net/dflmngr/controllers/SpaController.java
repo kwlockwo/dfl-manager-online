@@ -2,12 +2,20 @@ package net.dflmngr.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 public class SpaController {
 
     private static final String INDEX = "forward:/index.html";
+
+    @ModelAttribute
+    public void setNoCache(HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
+    }
 
     @GetMapping("/")
     public String index() {
