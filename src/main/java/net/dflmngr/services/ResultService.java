@@ -131,7 +131,7 @@ public class ResultService {
 			.distinct()
 			.collect(Collectors.toList());
 		Map<String, RawPlayerStats> rawStats = rawPlayerStatsRepository.findByRoundAndTeamIn(round, aflTeamIds).stream()
-			.collect(Collectors.toMap(s -> s.getTeam() + ":" + s.getJumperNo(), s -> s));
+			.collect(Collectors.toMap(s -> s.getTeam() + ":" + s.getJumperNo(), s -> s, (existing, replacement) -> existing));
 
 		Map<Integer, DflPlayerScores> playerScores = dflPlayerScoresRepository.findByRoundAndPlayerIdIn(round, playerIds).stream()
 			.collect(Collectors.toMap(DflPlayerScores::getPlayerId, s -> s));
