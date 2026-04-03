@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Ladder } from '../../types/api';
 
-type SortKey = 'pts' | 'percentage' | 'pointsFor';
+type SortKey = 'wins' | 'losses' | 'draws' | 'pointsFor' | 'averageFor' | 'pointsAgainst' | 'averageAgainst' | 'pts' | 'percentage';
 type SortDir = 'asc' | 'desc';
 
 interface SortCol {
@@ -14,7 +14,6 @@ const DEFAULT_SORT: SortCol[] = [
   { key: 'percentage', dir: 'desc' },
   { key: 'pointsFor', dir: 'desc' },
 ];
-
 
 function applySorts(entries: Ladder[], sort: SortCol[]): Ladder[] {
   return [...entries].sort((a, b) => {
@@ -42,7 +41,6 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
       const existingIndex = prev.findIndex(s => s.key === key);
 
       if (shiftKey) {
-        // Add/toggle as secondary sort
         if (existingIndex !== -1) {
           const updated = [...prev];
           updated[existingIndex] = {
@@ -53,7 +51,6 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
         }
         return [...prev, { key, dir: 'desc' }];
       } else {
-        // Single column sort — toggle if already primary, otherwise replace
         if (existingIndex === 0 && prev.length === 1) {
           return [{ key, dir: prev[0].dir === 'desc' ? 'asc' : 'desc' }];
         }
@@ -72,21 +69,25 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
     return <span className="ml-0.5">{arrow}{badge}</span>;
   };
 
-  const thClass = (key: SortKey) => {
+  const th = (key: SortKey, label: string, extraClass = '') => {
     const active = sort.some(s => s.key === key);
-    return `px-3 py-2 text-right cursor-pointer select-none hover:bg-gray-200 whitespace-nowrap ${
-      active ? 'bg-gray-200' : ''
-    }`;
+    return (
+      <th
+        className={`px-3 py-2 text-right cursor-pointer select-none hover:bg-gray-200 whitespace-nowrap ${active ? 'bg-gray-200' : ''} ${extraClass}`}
+        onClick={e => handleSort(key, e.shiftKey)}
+      >
+        {label}{sortIcon(key)}
+      </th>
+    );
   };
 
   const sorted = applySorts(entries, sort);
-  const showReset = userSorted;
 
   return (
     <div className="mb-6 rounded border border-gray-200 shadow-sm overflow-hidden">
       <div className="bg-gray-100 px-4 py-2 font-semibold border-b border-gray-200 flex items-center justify-between">
         <span>{title}</span>
-        {showReset && (
+        {userSorted && (
           <button
             onClick={() => { setSort(DEFAULT_SORT); setUserSorted(false); }}
             className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline"
@@ -100,19 +101,15 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
           <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
             <tr>
               <th className="px-3 py-2 text-left">Team</th>
-              <th className="px-3 py-2 text-right">W</th>
-              <th className="px-3 py-2 text-right">L</th>
-              <th className="px-3 py-2 text-right">D</th>
-              <th className="px-3 py-2 text-right">For</th>
-              {showAverages && <th className="px-3 py-2 text-right whitespace-nowrap">Ave For</th>}
-              {showAverages && <th className="px-3 py-2 text-right">Agst</th>}
-              {showAverages && <th className="px-3 py-2 text-right whitespace-nowrap">Ave Agst</th>}
-              <th className={thClass('pts')} onClick={e => handleSort('pts', e.shiftKey)}>
-                Pts{sortIcon('pts')}
-              </th>
-              <th className={thClass('percentage')} onClick={e => handleSort('percentage', e.shiftKey)}>
-                %{sortIcon('percentage')}
-              </th>
+              {th('wins', 'W')}
+              {th('losses', 'L')}
+              {th('draws', 'D')}
+              {th('pointsFor', 'For')}
+              {showAverages && th('averageFor', 'Ave For')}
+              {showAverages && th('pointsAgainst', 'Agst')}
+              {showAverages && th('averageAgainst', 'Ave Agst')}
+              {th('pts', 'Pts')}
+              {th('percentage', '%')}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
