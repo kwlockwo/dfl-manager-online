@@ -116,7 +116,7 @@ export default function PlayersTable({ players, team }: Props) {
 
   const sortIcon = (key: SortKey) => {
     const index = sort.findIndex(s => s.key === key);
-    if (index === -1) return <span className="text-gray-300 ml-0.5">↕</span>;
+    if (index === -1) return null;
     const arrow = sort[index].dir === 'desc' ? '↓' : '↑';
     const badge = userSorted && sort.length > 1
       ? <sup className="text-gray-400 text-[9px] ml-0.5">{index + 1}</sup>
