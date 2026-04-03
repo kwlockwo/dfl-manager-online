@@ -50,9 +50,9 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
               <th className="px-3 py-2 text-right">L</th>
               <th className="px-3 py-2 text-right">D</th>
               <th className="px-3 py-2 text-right">For</th>
-              {showAverages && <th className="px-3 py-2 text-right">Ave For</th>}
+              {showAverages && <th className="px-3 py-2 text-right whitespace-nowrap">Ave For</th>}
               {showAverages && <th className="px-3 py-2 text-right">Agst</th>}
-              {showAverages && <th className="px-3 py-2 text-right">Ave Agst</th>}
+              {showAverages && <th className="px-3 py-2 text-right whitespace-nowrap">Ave Agst</th>}
               <th className={thClass('pts')} onClick={() => handleSort('pts')}>
                 Pts{sortIcon('pts')}
               </th>
