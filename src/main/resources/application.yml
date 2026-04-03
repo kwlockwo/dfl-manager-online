@@ -1,6 +1,8 @@
 server:
   port: ${PORT:5001}
 spring:
+  jpa:
+    open-in-view: false
   datasource:
     url: ${JDBC_DATABASE_URL}
     username: ${JDBC_DATABASE_USERNAME}
