@@ -72,7 +72,7 @@ interface Props {
 }
 
 const HEADERS: { label: string; key: SortKey; left?: boolean }[] = [
-  { label: 'No.',       key: 'teamPlayerId',  left: true },
+  { label: 'No.',       key: 'teamPlayerId' },
   { label: 'Player',    key: 'name',          left: true },
   { label: 'Pos',       key: 'position' },
   { label: 'K',         key: 'kicks' },
