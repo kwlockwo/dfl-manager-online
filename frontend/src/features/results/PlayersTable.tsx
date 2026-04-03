@@ -43,7 +43,7 @@ export default function PlayersTable({ players, team }: Props) {
           </tr>
           <tr className="border-b border-gray-200">
             {['No.','Player','Pos','K','H','D','M','HO','FF','FA','T','G','B','Score','Predicted','Trend'].map(h => (
-              <th key={h} className="px-2 py-1 text-right first:text-left whitespace-nowrap">{h}</th>
+              <th key={h} className={`px-2 py-1 whitespace-nowrap ${h === 'No.' || h === 'Player' ? 'text-left' : 'text-right'}`}>{h}</th>
             ))}
           </tr>
         </thead>
