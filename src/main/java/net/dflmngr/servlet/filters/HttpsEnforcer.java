@@ -29,7 +29,10 @@ public class HttpsEnforcer implements Filter {
 
         String proto = request.getHeader(X_FORWARDED_PROTO);
         if (proto != null && !proto.startsWith("https")) {
-            response.sendRedirect("https://" + request.getServerName() + (request.getPathInfo() == null ? "" : request.getPathInfo()));
+            String path = request.getRequestURI();
+            String query = request.getQueryString();
+            String redirectUrl = "https://" + request.getServerName() + path + (query != null ? "?" + query : "");
+            response.sendRedirect(redirectUrl);
             return;
         }
 

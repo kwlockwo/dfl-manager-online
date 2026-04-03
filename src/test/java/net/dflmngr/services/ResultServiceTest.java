@@ -42,7 +42,7 @@ import net.dflmngr.repositories.DflSelectedPlayerRepository;
 import net.dflmngr.repositories.DflTeamPredictedScoresRepository;
 import net.dflmngr.repositories.DflTeamRepository;
 import net.dflmngr.repositories.DflTeamScoresRepository;
-import net.dflmngr.repositories.GlobalsRespository;
+import net.dflmngr.repositories.GlobalsRepository;
 import net.dflmngr.repositories.RawPlayerStatsRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +59,7 @@ class ResultServiceTest {
     @Mock private DflPlayerPredictedScoresRepository dflPlayerPredictedScoresRepository;
     @Mock private DflTeamScoresRepository dflTeamScoresRepository;
     @Mock private DflTeamPredictedScoresRepository dflTeamPredictedScoresRepository;
-    @Mock private GlobalsRespository globalsRespository;
+    @Mock private GlobalsRepository globalsRespository;
 
     @InjectMocks
     private ResultService resultService;
