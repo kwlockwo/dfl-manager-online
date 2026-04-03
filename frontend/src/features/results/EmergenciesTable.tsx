@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { SelectedPlayer } from '../../types/api';
 
 const STATUS_CLASS: Record<string, string> = {
@@ -15,13 +14,12 @@ function playerName(player: SelectedPlayer): string {
 }
 
 interface Props {
-  players: SelectedPlayer[];
+  readonly players: SelectedPlayer[];
+  readonly showStats: boolean;
 }
 
-export default function EmergenciesTable({ players }: Props) {
-  const [showStats, setShowStats] = useState(false);
+export default function EmergenciesTable({ players, showStats }: Props) {
   const sorted = [...players].sort((a, b) => a.emgSort - b.emgSort);
-
   const colClass = (stat: boolean) => stat && !showStats ? 'hidden md:table-cell' : '';
 
   return (
@@ -30,15 +28,7 @@ export default function EmergenciesTable({ players }: Props) {
         <thead className="bg-gray-50 text-gray-600">
           <tr>
             <th colSpan={showStats ? 16 : 5} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
-              <div className="flex items-center justify-between">
-                <span>Emergencies</span>
-                <button
-                  onClick={() => setShowStats(s => !s)}
-                  className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline md:hidden"
-                >
-                  {showStats ? 'Less' : 'Stats'}
-                </button>
-              </div>
+              Emergencies
             </th>
           </tr>
           <tr className="border-b border-gray-200">

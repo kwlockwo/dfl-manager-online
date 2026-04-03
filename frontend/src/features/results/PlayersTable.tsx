@@ -69,6 +69,7 @@ function rowClass(scrapingStatus: string | null): string {
 interface Props {
   readonly players: SelectedPlayer[];
   readonly team: TeamResults;
+  readonly showStats: boolean;
 }
 
 const STAT_KEYS: SortKey[] = ['kicks', 'handballs', 'disposals', 'marks', 'hitouts', 'freesFor', 'freesAgainst', 'tackles', 'goals', 'behinds', 'predictedScore', 'trend'];
@@ -92,10 +93,9 @@ const ALL_HEADERS: { label: string; key: SortKey; left?: boolean; stat?: boolean
   { label: 'Trend',     key: 'trend',          stat: true },
 ];
 
-export default function PlayersTable({ players, team }: Props) {
+export default function PlayersTable({ players, team, showStats }: Props) {
   const [sort, setSort] = useState<SortCol[]>(DEFAULT_SORT);
   const [userSorted, setUserSorted] = useState(false);
-  const [showStats, setShowStats] = useState(false);
 
   const handleSort = (key: SortKey, shiftKey: boolean) => {
     setUserSorted(true);
@@ -154,12 +154,6 @@ export default function PlayersTable({ players, team }: Props) {
                       Reset sort
                     </button>
                   )}
-                  <button
-                    onClick={() => setShowStats(s => !s)}
-                    className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline md:hidden"
-                  >
-                    {showStats ? 'Less' : 'Stats'}
-                  </button>
                 </div>
               </div>
             </th>

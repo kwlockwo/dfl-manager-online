@@ -14,6 +14,7 @@ export default function ResultsPage() {
   const [menu, setMenu] = useState<RoundMenu[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -50,13 +51,19 @@ export default function ResultsPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
       <div className="max-w-screen-xl mx-auto w-full px-4 py-6">
-        {/* Mobile sidebar toggle */}
-        <div className="md:hidden mb-3">
+        {/* Mobile controls */}
+        <div className="md:hidden mb-3 flex gap-2">
           <button
             onClick={() => setSidebarOpen(o => !o)}
             className="text-sm px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50"
           >
             {sidebarOpen ? 'Hide fixtures' : 'Show fixtures'}
+          </button>
+          <button
+            onClick={() => setShowStats(s => !s)}
+            className="text-sm px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50"
+          >
+            {showStats ? 'Hide stats' : 'Show stats'}
           </button>
         </div>
         {sidebarOpen && (
@@ -76,8 +83,8 @@ export default function ResultsPage() {
             )}
             {results && results.homeTeam && results.awayTeam ? (
               <div className="space-y-6">
-                <TeamResultsPanel team={results.homeTeam} label="Home" />
-                <TeamResultsPanel team={results.awayTeam} label="Away" />
+                <TeamResultsPanel team={results.homeTeam} label="Home" showStats={showStats} />
+                <TeamResultsPanel team={results.awayTeam} label="Away" showStats={showStats} />
               </div>
             ) : results ? (
               <div className="text-gray-500 italic">No results available for this game yet.</div>
