@@ -14,7 +14,7 @@ public class SpaController {
 
     @ModelAttribute
     public void setNoCache(HttpServletResponse response) {
-        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Cache-Control", "no-cache");
     }
 
     @GetMapping("/")
