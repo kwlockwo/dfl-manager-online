@@ -74,7 +74,7 @@ interface Props {
 
 const STAT_KEYS: SortKey[] = ['kicks', 'handballs', 'disposals', 'marks', 'hitouts', 'freesFor', 'freesAgainst', 'tackles', 'goals', 'behinds', 'predictedScore', 'trend'];
 
-const ALL_HEADERS: { label: string; key: SortKey; left?: boolean; stat?: boolean }[] = [
+const ALL_HEADERS: { label: string; shortLabel?: string; key: SortKey; left?: boolean; stat?: boolean }[] = [
   { label: 'No.',       key: 'teamPlayerId' },
   { label: 'Player',    key: 'name',          left: true },
   { label: 'Pos',       key: 'position' },
@@ -89,7 +89,7 @@ const ALL_HEADERS: { label: string; key: SortKey; left?: boolean; stat?: boolean
   { label: 'G',         key: 'goals',         stat: true },
   { label: 'B',         key: 'behinds',       stat: true },
   { label: 'Score',     key: 'score' },
-  { label: 'Predicted', key: 'predictedScore' },
+  { label: 'Predicted', shortLabel: 'Pred', key: 'predictedScore' },
   { label: 'Trend',     key: 'trend',          stat: true },
 ];
 
@@ -159,7 +159,7 @@ export default function PlayersTable({ players, team, showStats }: Props) {
             </th>
           </tr>
           <tr className="border-b border-gray-200">
-            {ALL_HEADERS.map(({ label, key, left, stat }) => {
+            {ALL_HEADERS.map(({ label, shortLabel, key, left, stat }) => {
               const active = sort.some(s => s.key === key);
               return (
                 <th
@@ -167,7 +167,7 @@ export default function PlayersTable({ players, team, showStats }: Props) {
                   className={`px-2 py-1 whitespace-nowrap cursor-pointer select-none hover:bg-gray-200 ${active ? 'bg-gray-200' : ''} ${left ? 'text-left' : 'text-right'} ${colClass(stat)}`}
                   onClick={e => handleSort(key, e.shiftKey)}
                 >
-                  {label}{sortIcon(key)}
+                  {shortLabel ? <><span className="md:hidden">{shortLabel}</span><span className="hidden md:inline">{label}</span></> : label}{sortIcon(key)}
                 </th>
               );
             })}

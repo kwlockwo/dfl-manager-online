@@ -39,7 +39,7 @@ export default function EmergenciesTable({ players, showStats }: Props) {
               <th key={h} className={`px-2 py-1 text-right whitespace-nowrap ${colClass(true)}`}>{h}</th>
             ))}
             <th className="px-2 py-1 text-right whitespace-nowrap">Score</th>
-            <th className="px-2 py-1 text-right whitespace-nowrap">Predicted</th>
+            <th className="px-2 py-1 text-right whitespace-nowrap"><span className="md:hidden">Pred</span><span className="hidden md:inline">Predicted</span></th>
             <th className={`px-2 py-1 text-right whitespace-nowrap ${colClass(true)}`}>Trend</th>
           </tr>
         </thead>
