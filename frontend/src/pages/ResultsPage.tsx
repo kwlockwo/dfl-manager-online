@@ -13,6 +13,7 @@ export default function ResultsPage() {
   const [results, setResults] = useState<Results | null>(null);
   const [menu, setMenu] = useState<RoundMenu[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -48,23 +49,41 @@ export default function ResultsPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      <div className="flex flex-1 max-w-screen-xl mx-auto w-full px-4 py-6 gap-4">
-        <aside className="w-52 shrink-0">
-          <ResultsSidebar menu={menu} />
-        </aside>
-        <main className="flex-1 min-w-0">
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-200">{error}</div>
-          )}
-          {results && results.homeTeam && results.awayTeam ? (
-            <div className="space-y-6">
-              <TeamResultsPanel team={results.homeTeam} label="Home" />
-              <TeamResultsPanel team={results.awayTeam} label="Away" />
-            </div>
-          ) : results ? (
-            <div className="text-gray-500 italic">No results available for this game yet.</div>
-          ) : null}
-        </main>
+      <div className="max-w-screen-xl mx-auto w-full px-4 py-6">
+        {/* Mobile sidebar toggle */}
+        <div className="md:hidden mb-3">
+          <button
+            onClick={() => setSidebarOpen(o => !o)}
+            className="text-sm px-3 py-1.5 rounded border border-gray-300 bg-white hover:bg-gray-50"
+          >
+            {sidebarOpen ? 'Hide fixtures' : 'Show fixtures'}
+          </button>
+        </div>
+        {sidebarOpen && (
+          <div className="md:hidden mb-4">
+            <ResultsSidebar menu={menu} />
+          </div>
+        )}
+
+        <div className="flex flex-1 gap-4">
+          {/* Desktop sidebar */}
+          <aside className="hidden md:block w-52 shrink-0">
+            <ResultsSidebar menu={menu} />
+          </aside>
+          <main className="flex-1 min-w-0">
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded border border-red-200">{error}</div>
+            )}
+            {results && results.homeTeam && results.awayTeam ? (
+              <div className="space-y-6">
+                <TeamResultsPanel team={results.homeTeam} label="Home" />
+                <TeamResultsPanel team={results.awayTeam} label="Away" />
+              </div>
+            ) : results ? (
+              <div className="text-gray-500 italic">No results available for this game yet.</div>
+            ) : null}
+          </main>
+        </div>
       </div>
     </div>
   );

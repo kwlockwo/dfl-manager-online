@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { SelectedPlayer } from '../../types/api';
 
 const STATUS_CLASS: Record<string, string> = {
@@ -18,20 +19,38 @@ interface Props {
 }
 
 export default function EmergenciesTable({ players }: Props) {
+  const [showStats, setShowStats] = useState(false);
   const sorted = [...players].sort((a, b) => a.emgSort - b.emgSort);
+
+  const colClass = (stat: boolean) => stat && !showStats ? 'hidden md:table-cell' : '';
 
   return (
     <div className="overflow-x-auto mt-3">
       <table className="w-full text-xs border border-gray-200">
         <thead className="bg-gray-50 text-gray-600">
           <tr>
-            <th colSpan={16} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
-              Emergencies
+            <th colSpan={showStats ? 16 : 5} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
+              <div className="flex items-center justify-between">
+                <span>Emergencies</span>
+                <button
+                  onClick={() => setShowStats(s => !s)}
+                  className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline md:hidden"
+                >
+                  {showStats ? 'Less' : 'Stats'}
+                </button>
+              </div>
             </th>
           </tr>
           <tr className="border-b border-gray-200">
-            {['No.','Player','Pos','K','H','D','M','HO','FF','FA','T','G','B','Score','Predicted','Trend'].map(h => (
-              <th key={h} className="px-2 py-1 text-right first:text-left whitespace-nowrap">{h}</th>
+            {['No.', 'Player', 'Pos'].map(h => (
+              <th key={h} className={`px-2 py-1 ${h === 'Player' ? 'text-left' : 'text-right'} whitespace-nowrap`}>{h}</th>
+            ))}
+            {['K','H','D','M','HO','FF','FA','T','G','B'].map(h => (
+              <th key={h} className={`px-2 py-1 text-right whitespace-nowrap ${colClass(true)}`}>{h}</th>
+            ))}
+            <th className="px-2 py-1 text-right whitespace-nowrap">Score</th>
+            {['Predicted','Trend'].map(h => (
+              <th key={h} className={`px-2 py-1 text-right whitespace-nowrap ${colClass(true)}`}>{h}</th>
             ))}
           </tr>
         </thead>
@@ -45,19 +64,19 @@ export default function EmergenciesTable({ players }: Props) {
                 <td className="px-2 py-1 text-right">{player.teamPlayerId}</td>
                 <td className="px-2 py-1 whitespace-nowrap">{playerName(player)}</td>
                 <td className="px-2 py-1 text-right">{player.position}</td>
-                <td className="px-2 py-1 text-right">{player.stats.kicks}</td>
-                <td className="px-2 py-1 text-right">{player.stats.handballs}</td>
-                <td className="px-2 py-1 text-right">{player.stats.disposals}</td>
-                <td className="px-2 py-1 text-right">{player.stats.marks}</td>
-                <td className="px-2 py-1 text-right">{player.stats.hitouts}</td>
-                <td className="px-2 py-1 text-right">{player.stats.freesFor}</td>
-                <td className="px-2 py-1 text-right">{player.stats.freesAgainst}</td>
-                <td className="px-2 py-1 text-right">{player.stats.tackles}</td>
-                <td className="px-2 py-1 text-right">{player.stats.goals}</td>
-                <td className="px-2 py-1 text-right">{player.stats.behinds}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.kicks}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.handballs}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.disposals}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.marks}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.hitouts}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.freesFor}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.freesAgainst}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.tackles}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.goals}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.behinds}</td>
                 <td className="px-2 py-1 text-right font-medium">{player.stats.score}</td>
-                <td className="px-2 py-1 text-right">{player.stats.predictedScore}</td>
-                <td className="px-2 py-1 text-right">{player.stats.trend}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.predictedScore}</td>
+                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.trend}</td>
               </tr>
             );
           })}

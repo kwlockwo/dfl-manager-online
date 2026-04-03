@@ -71,28 +71,31 @@ interface Props {
   readonly team: TeamResults;
 }
 
-const HEADERS: { label: string; key: SortKey; left?: boolean }[] = [
+const STAT_KEYS: SortKey[] = ['kicks', 'handballs', 'disposals', 'marks', 'hitouts', 'freesFor', 'freesAgainst', 'tackles', 'goals', 'behinds', 'predictedScore', 'trend'];
+
+const ALL_HEADERS: { label: string; key: SortKey; left?: boolean; stat?: boolean }[] = [
   { label: 'No.',       key: 'teamPlayerId' },
   { label: 'Player',    key: 'name',          left: true },
   { label: 'Pos',       key: 'position' },
-  { label: 'K',         key: 'kicks' },
-  { label: 'H',         key: 'handballs' },
-  { label: 'D',         key: 'disposals' },
-  { label: 'M',         key: 'marks' },
-  { label: 'HO',        key: 'hitouts' },
-  { label: 'FF',        key: 'freesFor' },
-  { label: 'FA',        key: 'freesAgainst' },
-  { label: 'T',         key: 'tackles' },
-  { label: 'G',         key: 'goals' },
-  { label: 'B',         key: 'behinds' },
+  { label: 'K',         key: 'kicks',         stat: true },
+  { label: 'H',         key: 'handballs',     stat: true },
+  { label: 'D',         key: 'disposals',     stat: true },
+  { label: 'M',         key: 'marks',         stat: true },
+  { label: 'HO',        key: 'hitouts',       stat: true },
+  { label: 'FF',        key: 'freesFor',      stat: true },
+  { label: 'FA',        key: 'freesAgainst',  stat: true },
+  { label: 'T',         key: 'tackles',       stat: true },
+  { label: 'G',         key: 'goals',         stat: true },
+  { label: 'B',         key: 'behinds',       stat: true },
   { label: 'Score',     key: 'score' },
-  { label: 'Predicted', key: 'predictedScore' },
-  { label: 'Trend',     key: 'trend' },
+  { label: 'Predicted', key: 'predictedScore', stat: true },
+  { label: 'Trend',     key: 'trend',          stat: true },
 ];
 
 export default function PlayersTable({ players, team }: Props) {
   const [sort, setSort] = useState<SortCol[]>(DEFAULT_SORT);
   const [userSorted, setUserSorted] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   const handleSort = (key: SortKey, shiftKey: boolean) => {
     setUserSorted(true);
@@ -124,33 +127,50 @@ export default function PlayersTable({ players, team }: Props) {
     return <span className="ml-0.5">{arrow}{badge}</span>;
   };
 
+  const isHidden = (stat?: boolean) => stat && !showStats;
+  const colClass = (stat?: boolean, extra = '') =>
+    `${isHidden(stat) ? 'hidden md:table-cell' : ''} ${extra}`.trim();
+
   const sorted = applySorts(players, sort);
   const showTwoFooterRows = team.currentPredictedScore !== team.score;
+
+  // On mobile with stats hidden, footer colspan adjusts: 3 visible cols (No, Player, Pos) before Score
+  const visibleLeadingCols = showStats ? 13 : 3;
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs border border-gray-200">
         <thead className="bg-gray-50 text-gray-600">
           <tr>
-            <th colSpan={17} className="px-2 py-1 text-left border-b border-gray-200 font-semibold flex items-center justify-between">
-              <span>Team</span>
-              {userSorted && (
-                <button
-                  onClick={() => { setSort(DEFAULT_SORT); setUserSorted(false); }}
-                  className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  Reset sort
-                </button>
-              )}
+            <th colSpan={showStats ? 17 : 5} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
+              <div className="flex items-center justify-between">
+                <span>Team</span>
+                <div className="flex items-center gap-3">
+                  {userSorted && (
+                    <button
+                      onClick={() => { setSort(DEFAULT_SORT); setUserSorted(false); }}
+                      className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      Reset sort
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowStats(s => !s)}
+                    className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline md:hidden"
+                  >
+                    {showStats ? 'Less' : 'Stats'}
+                  </button>
+                </div>
+              </div>
             </th>
           </tr>
           <tr className="border-b border-gray-200">
-            {HEADERS.map(({ label, key, left }) => {
+            {ALL_HEADERS.map(({ label, key, left, stat }) => {
               const active = sort.some(s => s.key === key);
               return (
                 <th
                   key={label}
-                  className={`px-2 py-1 whitespace-nowrap cursor-pointer select-none hover:bg-gray-200 ${active ? 'bg-gray-200' : ''} ${left ? 'text-left' : 'text-right'}`}
+                  className={`px-2 py-1 whitespace-nowrap cursor-pointer select-none hover:bg-gray-200 ${active ? 'bg-gray-200' : ''} ${left ? 'text-left' : 'text-right'} ${colClass(stat)}`}
                   onClick={e => handleSort(key, e.shiftKey)}
                 >
                   {label}{sortIcon(key)}
@@ -165,36 +185,36 @@ export default function PlayersTable({ players, team }: Props) {
               <td className="px-2 py-1 text-right">{player.teamPlayerId}</td>
               <td className="px-2 py-1 whitespace-nowrap">{playerName(player)}</td>
               <td className="px-2 py-1 text-right">{player.position}</td>
-              <td className="px-2 py-1 text-right">{player.stats.kicks}</td>
-              <td className="px-2 py-1 text-right">{player.stats.handballs}</td>
-              <td className="px-2 py-1 text-right">{player.stats.disposals}</td>
-              <td className="px-2 py-1 text-right">{player.stats.marks}</td>
-              <td className="px-2 py-1 text-right">{player.stats.hitouts}</td>
-              <td className="px-2 py-1 text-right">{player.stats.freesFor}</td>
-              <td className="px-2 py-1 text-right">{player.stats.freesAgainst}</td>
-              <td className="px-2 py-1 text-right">{player.stats.tackles}</td>
-              <td className="px-2 py-1 text-right">{player.stats.goals}</td>
-              <td className="px-2 py-1 text-right">{player.stats.behinds}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.kicks}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.handballs}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.disposals}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.marks}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.hitouts}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.freesFor}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.freesAgainst}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.tackles}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.goals}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.behinds}</td>
               <td className="px-2 py-1 text-right font-medium">{player.stats.score}</td>
-              <td className="px-2 py-1 text-right">{player.stats.predictedScore}</td>
-              <td className="px-2 py-1 text-right">{player.stats.trend}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.predictedScore}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.trend}</td>
             </tr>
           ))}
         </tbody>
         <tfoot className="border-t border-gray-300 bg-gray-50 font-semibold text-xs">
           <tr>
-            <td colSpan={13} className="px-2 py-1 text-right">Total</td>
+            <td colSpan={visibleLeadingCols} className="px-2 py-1 text-right">Total</td>
             <td className="px-2 py-1 text-right">{team.score}</td>
-            <td className="px-2 py-1 text-right">
+            <td className={colClass(true, 'px-2 py-1 text-right')}>
               {showTwoFooterRows ? team.currentPredictedScore : team.predictedScore}
             </td>
-            <td className="px-2 py-1 text-right">{team.trend}</td>
+            <td className={colClass(true, 'px-2 py-1 text-right')}>{team.trend}</td>
           </tr>
           {showTwoFooterRows && (
-            <tr>
-              <td colSpan={13} className="px-2 py-1 text-right">Pre-game</td>
+            <tr className={showStats ? '' : 'hidden md:table-row'}>
+              <td colSpan={visibleLeadingCols} className="px-2 py-1 text-right">Pre-game</td>
               <td />
-              <td className="px-2 py-1 text-right">{team.predictedScore}</td>
+              <td className={colClass(true, 'px-2 py-1 text-right')}>{team.predictedScore}</td>
               <td />
             </tr>
           )}
