@@ -192,7 +192,8 @@ export default function PlayersTable({ players, team }: Props) {
           </tr>
           {showTwoFooterRows && (
             <tr>
-              <td colSpan={14} className="px-2 py-1 text-right">Pre-game</td>
+              <td colSpan={13} className="px-2 py-1 text-right">Pre-game</td>
+              <td />
               <td className="px-2 py-1 text-right">{team.predictedScore}</td>
               <td />
             </tr>
