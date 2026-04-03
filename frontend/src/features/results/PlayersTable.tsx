@@ -89,8 +89,8 @@ const ALL_HEADERS: { label: string; key: SortKey; left?: boolean; stat?: boolean
   { label: 'G',         key: 'goals',         stat: true },
   { label: 'B',         key: 'behinds',       stat: true },
   { label: 'Score',     key: 'score' },
-  { label: 'Predicted', key: 'predictedScore', stat: true },
-  { label: 'Trend',     key: 'trend',          stat: true },
+  { label: 'Predicted', key: 'predictedScore' },
+  { label: 'Trend',     key: 'trend' },
 ];
 
 export default function PlayersTable({ players, team, showStats }: Props) {
@@ -142,7 +142,7 @@ export default function PlayersTable({ players, team, showStats }: Props) {
       <table className="w-full text-xs border border-gray-200">
         <thead className="bg-gray-50 text-gray-600">
           <tr>
-            <th colSpan={showStats ? 17 : 5} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
+            <th colSpan={showStats ? 17 : 6} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
               <div className="flex items-center justify-between">
                 <span>Team</span>
                 <div className="flex items-center gap-3">
@@ -190,8 +190,8 @@ export default function PlayersTable({ players, team, showStats }: Props) {
               <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.goals}</td>
               <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.behinds}</td>
               <td className="px-2 py-1 text-right font-medium">{player.stats.score}</td>
-              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.predictedScore}</td>
-              <td className={colClass(true, 'px-2 py-1 text-right')}>{player.stats.trend}</td>
+              <td className="px-2 py-1 text-right">{player.stats.predictedScore}</td>
+              <td className="px-2 py-1 text-right">{player.stats.trend}</td>
             </tr>
           ))}
         </tbody>
@@ -199,16 +199,16 @@ export default function PlayersTable({ players, team, showStats }: Props) {
           <tr>
             <td colSpan={visibleLeadingCols} className="px-2 py-1 text-right">Total</td>
             <td className="px-2 py-1 text-right">{team.score}</td>
-            <td className={colClass(true, 'px-2 py-1 text-right')}>
+            <td className="px-2 py-1 text-right">
               {showTwoFooterRows ? team.currentPredictedScore : team.predictedScore}
             </td>
-            <td className={colClass(true, 'px-2 py-1 text-right')}>{team.trend}</td>
+            <td className="px-2 py-1 text-right">{team.trend}</td>
           </tr>
           {showTwoFooterRows && (
-            <tr className={showStats ? '' : 'hidden md:table-row'}>
+            <tr>
               <td colSpan={visibleLeadingCols} className="px-2 py-1 text-right">Pre-game</td>
               <td />
-              <td className={colClass(true, 'px-2 py-1 text-right')}>{team.predictedScore}</td>
+              <td className="px-2 py-1 text-right">{team.predictedScore}</td>
               <td />
             </tr>
           )}

@@ -27,7 +27,7 @@ export default function EmergenciesTable({ players, showStats }: Props) {
       <table className="w-full text-xs border border-gray-200">
         <thead className="bg-gray-50 text-gray-600">
           <tr>
-            <th colSpan={showStats ? 16 : 5} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
+            <th colSpan={showStats ? 16 : 6} className="px-2 py-1 text-left border-b border-gray-200 font-semibold">
               Emergencies
             </th>
           </tr>
@@ -40,7 +40,7 @@ export default function EmergenciesTable({ players, showStats }: Props) {
             ))}
             <th className="px-2 py-1 text-right whitespace-nowrap">Score</th>
             {['Predicted','Trend'].map(h => (
-              <th key={h} className={`px-2 py-1 text-right whitespace-nowrap ${colClass(true)}`}>{h}</th>
+              <th key={h} className="px-2 py-1 text-right whitespace-nowrap">{h}</th>
             ))}
           </tr>
         </thead>
@@ -65,8 +65,8 @@ export default function EmergenciesTable({ players, showStats }: Props) {
                 <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.goals}</td>
                 <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.behinds}</td>
                 <td className="px-2 py-1 text-right font-medium">{player.stats.score}</td>
-                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.predictedScore}</td>
-                <td className={`px-2 py-1 text-right ${colClass(true)}`}>{player.stats.trend}</td>
+                <td className="px-2 py-1 text-right">{player.stats.predictedScore}</td>
+                <td className="px-2 py-1 text-right">{player.stats.trend}</td>
               </tr>
             );
           })}
