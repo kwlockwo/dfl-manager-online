@@ -21,4 +21,9 @@ public class LadderRestController {
 	public List<Ladder> ladder() {
 		return ladderService.getLadder();
 	}
+
+	@GetMapping(value = "/ladder/live", produces = "application/json")
+	public List<Ladder> liveLadder() {
+		return ladderService.getLiveLadder();
+	}
 }

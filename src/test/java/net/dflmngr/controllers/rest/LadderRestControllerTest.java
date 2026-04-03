@@ -78,4 +78,38 @@ class LadderRestControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(0));
     }
+
+    @Test
+    void getLiveLadder_returns200WithJsonContentType() throws Exception {
+        when(ladderService.getLiveLadder()).thenReturn(List.of());
+
+        mockMvc.perform(get("/ladder/live").accept("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith("application/json"));
+    }
+
+    @Test
+    void getLiveLadder_returnsLiveEntries() throws Exception {
+        when(ladderService.getLiveLadder()).thenReturn(List.of(
+            makeLadder("AAA", "Team Alpha", 16),
+            makeLadder("BBB", "Team Beta", 12)
+        ));
+
+        mockMvc.perform(get("/ladder/live").accept("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].teamCode").value("AAA"))
+            .andExpect(jsonPath("$[0].pts").value(16))
+            .andExpect(jsonPath("$[1].teamCode").value("BBB"))
+            .andExpect(jsonPath("$[1].pts").value(12));
+    }
+
+    @Test
+    void getLiveLadder_returnsEmptyArrayWhenNoLiveData() throws Exception {
+        when(ladderService.getLiveLadder()).thenReturn(List.of());
+
+        mockMvc.perform(get("/ladder/live").accept("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(0));
+    }
 }
