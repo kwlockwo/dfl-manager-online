@@ -6,13 +6,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import net.dflmngr.model.web.GameMenu;
 import net.dflmngr.model.web.Results;
+import net.dflmngr.model.web.RoundMenu;
 import net.dflmngr.model.web.TeamResults;
 import net.dflmngr.services.ResultService;
 
@@ -83,5 +87,77 @@ class ResultsRestControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.round").value(5))
             .andExpect(jsonPath("$.game").value(2));
+    }
+
+    @Test
+    void getCurrentResults_returns200WithJsonContentType() throws Exception {
+        when(resultService.getCurrentResults()).thenReturn(makeResults(3, 1, "AAA", "BBB"));
+
+        mockMvc.perform(get("/results").accept("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith("application/json"));
+    }
+
+    @Test
+    void getCurrentResults_returnsCurrentRoundAndGame() throws Exception {
+        when(resultService.getCurrentResults()).thenReturn(makeResults(3, 1, "AAA", "BBB"));
+
+        mockMvc.perform(get("/results").accept("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.round").value(3))
+            .andExpect(jsonPath("$.game").value(1))
+            .andExpect(jsonPath("$.homeTeam.teamCode").value("AAA"))
+            .andExpect(jsonPath("$.awayTeam.teamCode").value("BBB"));
+    }
+
+    @Test
+    void getMenu_returnsMenuForCurrentRoundWhenNoParams() throws Exception {
+        when(resultService.getCurrentResults()).thenReturn(makeResults(3, 1, "AAA", "BBB"));
+
+        GameMenu gameMenu = new GameMenu();
+        gameMenu.setGame(1);
+        gameMenu.setHomeTeam("AAA");
+        gameMenu.setAwayTeam("BBB");
+        gameMenu.setActive(true);
+        gameMenu.setResultsUri("/results/3/1");
+
+        RoundMenu roundMenu = new RoundMenu();
+        roundMenu.setRound(3);
+        roundMenu.setActive(true);
+        roundMenu.setGames(List.of(gameMenu));
+
+        when(resultService.getMenu(3, 1)).thenReturn(List.of(roundMenu));
+
+        mockMvc.perform(get("/results/menu").accept("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith("application/json"))
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].round").value(3))
+            .andExpect(jsonPath("$[0].active").value(true))
+            .andExpect(jsonPath("$[0].games[0].homeTeam").value("AAA"))
+            .andExpect(jsonPath("$[0].games[0].resultsUri").value("/results/3/1"));
+    }
+
+    @Test
+    void getMenu_returnsMenuForSpecificRoundAndGame() throws Exception {
+        GameMenu gameMenu = new GameMenu();
+        gameMenu.setGame(2);
+        gameMenu.setHomeTeam("CCC");
+        gameMenu.setAwayTeam("DDD");
+        gameMenu.setActive(true);
+        gameMenu.setResultsUri("/results/2/2");
+
+        RoundMenu roundMenu = new RoundMenu();
+        roundMenu.setRound(2);
+        roundMenu.setActive(true);
+        roundMenu.setGames(List.of(gameMenu));
+
+        when(resultService.getMenu(2, 2)).thenReturn(List.of(roundMenu));
+
+        mockMvc.perform(get("/results/menu?round=2&game=2").accept("application/json"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].round").value(2))
+            .andExpect(jsonPath("$[0].games[0].homeTeam").value("CCC"));
     }
 }
