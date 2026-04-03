@@ -40,7 +40,7 @@ import net.dflmngr.repositories.DflSelectedPlayerRepository;
 import net.dflmngr.repositories.DflTeamPredictedScoresRepository;
 import net.dflmngr.repositories.DflTeamRepository;
 import net.dflmngr.repositories.DflTeamScoresRepository;
-import net.dflmngr.repositories.GlobalsRespository;
+import net.dflmngr.repositories.GlobalsRepository;
 import net.dflmngr.repositories.RawPlayerStatsRepository;
 
 @Service
@@ -58,12 +58,12 @@ public class ResultService {
 	private final DflPlayerPredictedScoresRepository dflPlayerPredictedScoresRepository;
 	private final DflTeamScoresRepository dflTeamScoresRepository;
 	private final DflTeamPredictedScoresRepository dflTeamPredictedScoresRepository;
-	private final GlobalsRespository globalsRespository;
+	private final GlobalsRepository globalsRespository;
 	
 	public ResultService(DflFixtureRepository dflFixtureRepository, DflTeamRepository dflTeamRepository, DflPlayerRepository dflPlayerRepository, AflPlayerRepository aflPlayerRepository,
 			             DflSelectedPlayerRepository dflSelectedPlayerRepository, RawPlayerStatsRepository rawPlayerStatsRepository, DflPlayerScoresRepository dflPlayerScoresRepository,
 			             DflPlayerPredictedScoresRepository dflPlayerPredictedScoresRepository, DflTeamScoresRepository dflTeamScoresRepository,
-			             DflTeamPredictedScoresRepository dflTeamPredictedScoresRepository, GlobalsRespository globalsRespository) {
+			             DflTeamPredictedScoresRepository dflTeamPredictedScoresRepository, GlobalsRepository globalsRespository) {
 		this.dflFixtureRepository = dflFixtureRepository;
 		this.dflTeamRepository = dflTeamRepository;
 		this.dflPlayerRepository = dflPlayerRepository;
