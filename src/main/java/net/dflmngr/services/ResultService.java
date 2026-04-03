@@ -3,8 +3,9 @@ package net.dflmngr.services;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,6 @@ import net.dflmngr.model.entities.DflTeamScores;
 import net.dflmngr.model.entities.Globals;
 import net.dflmngr.model.entities.RawPlayerStats;
 import net.dflmngr.model.entities.keys.DflFixturePK;
-import net.dflmngr.model.entities.keys.DflPlayerPredictedScoresPK;
-import net.dflmngr.model.entities.keys.DflPlayerScoresPK;
 import net.dflmngr.model.entities.keys.DflTeamPredictedScoresPK;
 import net.dflmngr.model.entities.keys.DflTeamScoresPK;
 import net.dflmngr.model.entities.keys.GlobalsPK;
@@ -79,23 +78,68 @@ public class ResultService {
 	}
 	
 	public Results getResults(int round, int game) {
-		
+
 		Results results = new Results();
 		results.setRound(round);
 		results.setGame(game);
-		
+
 		try {
 			DflFixture dflFixture = getFixture(round, game);
 			String homeTeamCode = dflFixture.getHomeTeam();
 			String awayTeamCode = dflFixture.getAwayTeam();
 
-			results.setHomeTeam(getTeamResults(round, homeTeamCode));
-			results.setAwayTeam(getTeamResults(round, awayTeamCode));
+			List<DflSelectedPlayer> homeSelected = dflSelectedPlayerRepository.findByRoundAndTeamCode(round, homeTeamCode);
+			List<DflSelectedPlayer> awaySelected = dflSelectedPlayerRepository.findByRoundAndTeamCode(round, awayTeamCode);
+
+			List<DflSelectedPlayer> allSelected = new ArrayList<>();
+			allSelected.addAll(homeSelected);
+			allSelected.addAll(awaySelected);
+
+			RoundData roundData = loadRoundData(round, allSelected);
+
+			results.setHomeTeam(getTeamResults(round, homeTeamCode, homeSelected, roundData));
+			results.setAwayTeam(getTeamResults(round, awayTeamCode, awaySelected, roundData));
 		} catch (NoSuchElementException ex) {
 			logger.error("Fixture not found for round={} game={}", round, game, ex);
 		}
-			
+
 		return results;
+	}
+
+	private record RoundData(
+		Map<Integer, DflPlayer> dflPlayers,
+		Map<Integer, AflPlayer> aflPlayers,
+		Map<String, RawPlayerStats> rawStats,
+		Map<Integer, DflPlayerScores> playerScores,
+		Map<Integer, DflPlayerPredictedScores> predictedScores
+	) {}
+
+	private RoundData loadRoundData(int round, List<DflSelectedPlayer> allSelected) {
+		List<Integer> playerIds = allSelected.stream()
+			.map(DflSelectedPlayer::getPlayerId)
+			.collect(Collectors.toList());
+
+		Map<Integer, DflPlayer> dflPlayers = dflPlayerRepository.findByPlayerIdIn(playerIds).stream()
+			.collect(Collectors.toMap(DflPlayer::getPlayerId, p -> p));
+
+		List<AflPlayer> aflPlayerList = aflPlayerRepository.findByDflPlayerIdIn(playerIds);
+		Map<Integer, AflPlayer> aflPlayers = aflPlayerList.stream()
+			.collect(Collectors.toMap(AflPlayer::getDflPlayerId, p -> p));
+
+		List<String> aflTeamIds = aflPlayerList.stream()
+			.map(AflPlayer::getTeamId)
+			.distinct()
+			.collect(Collectors.toList());
+		Map<String, RawPlayerStats> rawStats = rawPlayerStatsRepository.findByRoundAndTeamIn(round, aflTeamIds).stream()
+			.collect(Collectors.toMap(s -> s.getTeam() + ":" + s.getJumperNo(), s -> s, (existing, replacement) -> existing));
+
+		Map<Integer, DflPlayerScores> playerScores = dflPlayerScoresRepository.findByRoundAndPlayerIdIn(round, playerIds).stream()
+			.collect(Collectors.toMap(DflPlayerScores::getPlayerId, s -> s));
+
+		Map<Integer, DflPlayerPredictedScores> predictedScores = dflPlayerPredictedScoresRepository.findByRoundAndPlayerIdIn(round, playerIds).stream()
+			.collect(Collectors.toMap(DflPlayerPredictedScores::getPlayerId, s -> s));
+
+		return new RoundData(dflPlayers, aflPlayers, rawStats, playerScores, predictedScores);
 	}
 	
 	public Results getCurrentResults() {
@@ -175,10 +219,10 @@ public class ResultService {
 		return menu;
 	}
 	
-	private TeamResults getTeamResults(int round, String teamCode) {
-		
+	private TeamResults getTeamResults(int round, String teamCode, List<DflSelectedPlayer> selectedTeam, RoundData roundData) {
+
 		TeamResults teamResults = new TeamResults();
-		
+
 		if(teamCode != null) {
 			DflTeam team = dflTeamRepository.findById(teamCode).orElseThrow();
 			teamResults.setTeamCode(teamCode);
@@ -186,34 +230,34 @@ public class ResultService {
 
 			List<SelectedPlayer> players = new ArrayList<>();
 			List<SelectedPlayer> emergencies = new ArrayList<>();
-			
-			int currentPredictedScore = calculateTeamScore(round, teamCode, players, emergencies);
-			
+
+			int currentPredictedScore = calculateTeamScore(selectedTeam, players, emergencies, roundData);
+
 			teamResults.setPlayers(players);
-			
+
 			setEmgsInd(emergencies, teamResults);
-			
+
 			teamResults.setEmergencies(emergencies);
-			
+
 			DflTeamScoresPK dflTeamScoresPK = new DflTeamScoresPK();
 			dflTeamScoresPK.setRound(round);
 			dflTeamScoresPK.setTeamCode(teamCode);
 			DflTeamScores dflTeamScore = dflTeamScoresRepository.findById(dflTeamScoresPK).orElse(null);
-			
+
 			DflTeamPredictedScoresPK dflTeamPredictedScoresPK = new DflTeamPredictedScoresPK();
 			dflTeamPredictedScoresPK.setRound(round);
 			dflTeamPredictedScoresPK.setTeamCode(teamCode);
 			DflTeamPredictedScores dflTeamPredictedScore = dflTeamPredictedScoresRepository.findById(dflTeamPredictedScoresPK).orElseThrow();
-			
+
 			if(dflTeamScore != null) {
 				teamResults.setScore(dflTeamScore.getScore());
 			} else {
 				teamResults.setScore(0);
 			}
-			
+
 			teamResults.setCurrentPredictedScore(currentPredictedScore);
 			teamResults.setPredictedScore(dflTeamPredictedScore.getPredictedScore());
-			
+
 			int trend = 0;
 			if(currentPredictedScore == dflTeamPredictedScore.getPredictedScore()) {
 				trend = teamResults.getScore() - dflTeamPredictedScore.getPredictedScore();
@@ -222,17 +266,15 @@ public class ResultService {
 			}
 			teamResults.setTrend(trend);
 		}
-		
+
 		return teamResults;
 	}
 
-	private int calculateTeamScore(int round, String teamCode, List<SelectedPlayer> players, List<SelectedPlayer> emergencies) {
-		List<DflSelectedPlayer> selectedTeam = dflSelectedPlayerRepository.findByRoundAndTeamCode(round, teamCode);
-
+	private int calculateTeamScore(List<DflSelectedPlayer> selectedTeam, List<SelectedPlayer> players, List<SelectedPlayer> emergencies, RoundData roundData) {
 		int currentPredictedScore = 0;
 		for(DflSelectedPlayer selectedPlayer : selectedTeam) {
 			if(selectedPlayer.isScoreUsed()) {
-				SelectedPlayer sp = getSelectedPlayer(selectedPlayer);
+				SelectedPlayer sp = getSelectedPlayer(selectedPlayer, roundData);
 				players.add(sp);
 				if(sp.isDnp()) {
 					currentPredictedScore = currentPredictedScore + 0;
@@ -244,33 +286,33 @@ public class ResultService {
 					}
 				}
 			} else {
-				emergencies.add(getSelectedPlayer(selectedPlayer));
+				emergencies.add(getSelectedPlayer(selectedPlayer, roundData));
 			}
 		}
 
 		return currentPredictedScore;
 	}
-	
-	private SelectedPlayer getSelectedPlayer(DflSelectedPlayer selectedPlayer) {
+
+	private SelectedPlayer getSelectedPlayer(DflSelectedPlayer selectedPlayer, RoundData roundData) {
 		SelectedPlayer sp = new SelectedPlayer();
-		
+
 		sp.setPlayerId(selectedPlayer.getPlayerId());
 		sp.setTeamPlayerId(selectedPlayer.getTeamPlayerId());
-		
-		DflPlayer player = dflPlayerRepository.findById(selectedPlayer.getPlayerId()).orElseThrow();
-		
+
+		DflPlayer player = roundData.dflPlayers().get(selectedPlayer.getPlayerId());
+
 		if(player.getInitial() == null || player.getInitial().isEmpty()) {
 			sp.setName(player.getFirstName() + " " + player.getLastName());
 		} else {
 			sp.setName(player.getFirstName() + " " + player.getInitial() + ". " + player.getLastName());
 		}
-		
+
 		sp.setPosition(player.getPosition());
 		sp.setHasPlayer(selectedPlayer.hasPlayed());
 		sp.setScoreUsed(selectedPlayer.isScoreUsed());
 		sp.setDnp(selectedPlayer.isDnp());
 		sp.setReplacementInd(selectedPlayer.getReplacementInd());
-		
+
 		if(selectedPlayer.getReplacementInd() != null && selectedPlayer.getReplacementInd().equals("*")) {
 			sp.setEmgSort(1);
 		} else if(selectedPlayer.getReplacementInd() != null && selectedPlayer.getReplacementInd().equals("**")) {
@@ -278,9 +320,9 @@ public class ResultService {
 		} else {
 			sp.setEmgSort(selectedPlayer.isEmergency());
 		}
-		
-		sp.setStats(getPlayerStats(selectedPlayer.getRound(), selectedPlayer.getPlayerId()));
-		
+
+		sp.setStats(getPlayerStats(selectedPlayer.getPlayerId(), roundData));
+
 		return sp;
 	}
 
@@ -309,45 +351,35 @@ public class ResultService {
 		}
 	}
 	
-	private PlayerStats getPlayerStats(int round, int playerId) {
+	private PlayerStats getPlayerStats(int playerId, RoundData roundData) {
 		PlayerStats playerStats = new PlayerStats();
-		
-		AflPlayer aflPlayer = aflPlayerRepository.findByDflPlayerId(playerId);
-				
-		RawPlayerStats rawPlayerStats = rawPlayerStatsRepository.findByRoundAndTeamAndJumperNo(round, aflPlayer.getTeamId(), aflPlayer.getJumperNo());
-		
-		if(rawPlayerStats != null) {
-			playerStats.setKicks(rawPlayerStats.getKicks());
-			playerStats.setHandballs(rawPlayerStats.getHandballs());
-			playerStats.setDisposals(rawPlayerStats.getDisposals());
-			playerStats.setMarks(rawPlayerStats.getMarks());
-			playerStats.setHitouts(rawPlayerStats.getHitouts());
-			playerStats.setFreesFor(rawPlayerStats.getFreesFor());
-			playerStats.setFreesAgainst(rawPlayerStats.getFreesAgainst());
-			playerStats.setTackles(rawPlayerStats.getTackles());
-			playerStats.setGoals(rawPlayerStats.getGoals());
-			playerStats.setBehinds(rawPlayerStats.getBehinds());
-			playerStats.setScrapingStatus(rawPlayerStats.getScrapingStatus());
+
+		AflPlayer aflPlayer = roundData.aflPlayers().get(playerId);
+		if(aflPlayer != null) {
+			RawPlayerStats rawPlayerStats = roundData.rawStats().get(aflPlayer.getTeamId() + ":" + aflPlayer.getJumperNo());
+			if(rawPlayerStats != null) {
+				playerStats.setKicks(rawPlayerStats.getKicks());
+				playerStats.setHandballs(rawPlayerStats.getHandballs());
+				playerStats.setDisposals(rawPlayerStats.getDisposals());
+				playerStats.setMarks(rawPlayerStats.getMarks());
+				playerStats.setHitouts(rawPlayerStats.getHitouts());
+				playerStats.setFreesFor(rawPlayerStats.getFreesFor());
+				playerStats.setFreesAgainst(rawPlayerStats.getFreesAgainst());
+				playerStats.setTackles(rawPlayerStats.getTackles());
+				playerStats.setGoals(rawPlayerStats.getGoals());
+				playerStats.setBehinds(rawPlayerStats.getBehinds());
+				playerStats.setScrapingStatus(rawPlayerStats.getScrapingStatus());
+			}
 		}
-		
-		DflPlayerScoresPK dflPlayerScoresPK = new DflPlayerScoresPK();
-		dflPlayerScoresPK.setPlayerId(playerId);
-		dflPlayerScoresPK.setRound(round);
-		
-		DflPlayerScores dflPlayerScores = dflPlayerScoresRepository.findById(dflPlayerScoresPK).orElse(null);
-		
-		DflPlayerPredictedScoresPK dflPlayerPredictedScoresPK = new DflPlayerPredictedScoresPK();
-		dflPlayerPredictedScoresPK.setPlayerId(playerId);
-		dflPlayerPredictedScoresPK.setRound(round);
-		
-		Optional<DflPlayerPredictedScores> dflPlayerPredictedScores = dflPlayerPredictedScoresRepository.findById(dflPlayerPredictedScoresPK);
-		
-		if(dflPlayerPredictedScores.isPresent()) {
-			playerStats.setPredictedScore(dflPlayerPredictedScores.get().getPredictedScore());
+
+		DflPlayerPredictedScores predictedScores = roundData.predictedScores().get(playerId);
+		if(predictedScores != null) {
+			playerStats.setPredictedScore(predictedScores.getPredictedScore());
 		} else {
 			playerStats.setPredictedScore(25);
 		}
-		
+
+		DflPlayerScores dflPlayerScores = roundData.playerScores().get(playerId);
 		int trend = 0;
 		if(dflPlayerScores != null) {
 			playerStats.setScore(dflPlayerScores.getScore());
@@ -355,9 +387,9 @@ public class ResultService {
 		} else {
 			trend = trend - playerStats.getPredictedScore();
 		}
-		
+
 		playerStats.setTrend(trend);
-		
+
 		return playerStats;
 	}
 		
