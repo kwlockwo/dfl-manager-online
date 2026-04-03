@@ -10,8 +10,18 @@ export default defineConfig({
   server: {
     proxy: {
       '/ladder': 'http://localhost:5001',
-      '/fixtures': 'http://localhost:5001',
-      '/results': 'http://localhost:5001',
+      '/fixtures': {
+        target: 'http://localhost:5001',
+        bypass: (req) => {
+          if (req.headers.accept?.includes('text/html')) return req.url;
+        },
+      },
+      '/results': {
+        target: 'http://localhost:5001',
+        bypass: (req) => {
+          if (req.headers.accept?.includes('text/html')) return req.url;
+        },
+      },
     },
   },
   test: {
