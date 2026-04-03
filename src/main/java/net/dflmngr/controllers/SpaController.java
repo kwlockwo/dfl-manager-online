@@ -19,6 +19,11 @@ public class SpaController {
         return INDEX;
     }
 
+    @GetMapping("/results")
+    public String results() {
+        return INDEX;
+    }
+
     @GetMapping("/results/{round}/{game}")
     public String results(@PathVariable int round, @PathVariable int game) {
         return INDEX;
