@@ -34,6 +34,7 @@ interface Props {
 export default function LadderTable({ entries, title, showAverages }: Props) {
   const [sort, setSort] = useState<SortCol[]>(DEFAULT_SORT);
   const [userSorted, setUserSorted] = useState(false);
+  const [showAllCols, setShowAllCols] = useState(false);
 
   const handleSort = (key: SortKey, shiftKey: boolean) => {
     setUserSorted(true);
@@ -87,27 +88,35 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
     <div className="mb-6 rounded border border-gray-200 shadow-sm overflow-hidden">
       <div className="bg-gray-100 px-4 py-2 font-semibold border-b border-gray-200 flex items-center justify-between">
         <span>{title}</span>
-        {userSorted && (
+        <div className="flex items-center gap-3">
+          {userSorted && (
+            <button
+              onClick={() => { setSort(DEFAULT_SORT); setUserSorted(false); }}
+              className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              Reset sort
+            </button>
+          )}
           <button
-            onClick={() => { setSort(DEFAULT_SORT); setUserSorted(false); }}
-            className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline"
+            onClick={() => setShowAllCols(s => !s)}
+            className="text-xs font-normal text-blue-600 hover:text-blue-800 hover:underline md:hidden"
           >
-            Reset sort
+            {showAllCols ? 'Less' : 'More'}
           </button>
-        )}
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
             <tr>
               <th className="px-3 py-2 text-left">Team</th>
-              {th('wins', 'W')}
-              {th('losses', 'L')}
-              {th('draws', 'D')}
-              {th('pointsFor', 'For')}
-              {showAverages && th('averageFor', 'Ave For')}
-              {showAverages && th('pointsAgainst', 'Agst')}
-              {showAverages && th('averageAgainst', 'Ave Agst')}
+              {th('wins', 'W', showAllCols ? '' : 'hidden md:table-cell')}
+              {th('losses', 'L', showAllCols ? '' : 'hidden md:table-cell')}
+              {th('draws', 'D', showAllCols ? '' : 'hidden md:table-cell')}
+              {th('pointsFor', 'For', showAllCols ? '' : 'hidden md:table-cell')}
+              {showAverages && th('averageFor', 'Ave For', showAllCols ? '' : 'hidden md:table-cell')}
+              {showAverages && th('pointsAgainst', 'Agst', showAllCols ? '' : 'hidden md:table-cell')}
+              {showAverages && th('averageAgainst', 'Ave Agst', showAllCols ? '' : 'hidden md:table-cell')}
               {th('pts', 'Pts')}
               {th('percentage', '%')}
             </tr>
@@ -116,13 +125,13 @@ export default function LadderTable({ entries, title, showAverages }: Props) {
             {sorted.map((entry, i) => (
               <tr key={entry.teamCode} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                 <td className="px-3 py-2">{entry.displayName}</td>
-                <td className="px-3 py-2 text-right">{entry.wins}</td>
-                <td className="px-3 py-2 text-right">{entry.losses}</td>
-                <td className="px-3 py-2 text-right">{entry.draws}</td>
-                <td className="px-3 py-2 text-right">{entry.pointsFor}</td>
-                {showAverages && <td className="px-3 py-2 text-right">{entry.averageFor.toFixed(2)}</td>}
-                {showAverages && <td className="px-3 py-2 text-right">{entry.pointsAgainst}</td>}
-                {showAverages && <td className="px-3 py-2 text-right">{entry.averageAgainst.toFixed(2)}</td>}
+                <td className={`px-3 py-2 text-right ${showAllCols ? '' : 'hidden md:table-cell'}`}>{entry.wins}</td>
+                <td className={`px-3 py-2 text-right ${showAllCols ? '' : 'hidden md:table-cell'}`}>{entry.losses}</td>
+                <td className={`px-3 py-2 text-right ${showAllCols ? '' : 'hidden md:table-cell'}`}>{entry.draws}</td>
+                <td className={`px-3 py-2 text-right ${showAllCols ? '' : 'hidden md:table-cell'}`}>{entry.pointsFor}</td>
+                {showAverages && <td className={`px-3 py-2 text-right ${showAllCols ? '' : 'hidden md:table-cell'}`}>{entry.averageFor.toFixed(2)}</td>}
+                {showAverages && <td className={`px-3 py-2 text-right ${showAllCols ? '' : 'hidden md:table-cell'}`}>{entry.pointsAgainst}</td>}
+                {showAverages && <td className={`px-3 py-2 text-right ${showAllCols ? '' : 'hidden md:table-cell'}`}>{entry.averageAgainst.toFixed(2)}</td>}
                 <td className="px-3 py-2 text-right font-medium">{entry.pts}</td>
                 <td className="px-3 py-2 text-right">{entry.percentage.toFixed(2)}</td>
               </tr>
