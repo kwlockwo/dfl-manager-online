@@ -11,6 +11,11 @@ spring:
       connection-timeout: 5000
       minimum-idle: 2
       maximum-pool-size: 5
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
 logging:
   level:
     net:
