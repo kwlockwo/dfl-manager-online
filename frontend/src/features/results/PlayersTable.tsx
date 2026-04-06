@@ -134,9 +134,6 @@ export default function PlayersTable({ players, team, showStats }: Props) {
   const sorted = applySorts(players, sort);
   const showTwoFooterRows = team.currentPredictedScore !== team.score;
 
-  // On mobile with stats hidden, footer colspan adjusts: 3 visible cols (No, Player, Pos) before Score
-  const visibleLeadingCols = showStats ? 13 : 3;
-
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs border border-gray-200">
@@ -197,7 +194,10 @@ export default function PlayersTable({ players, team, showStats }: Props) {
         </tbody>
         <tfoot className="border-t border-gray-300 bg-gray-50 font-semibold text-xs">
           <tr>
-            <td colSpan={visibleLeadingCols} className="px-2 py-1 text-right">Total</td>
+            <td className="px-2 py-1" />
+            <td className="px-2 py-1" />
+            <td className="px-2 py-1 text-right">Total</td>
+            {STAT_KEYS.slice(0, 10).map(k => <td key={k} className={colClass(true)} />)}
             <td className="px-2 py-1 text-right">{team.score}</td>
             <td className="px-2 py-1 text-right">
               {showTwoFooterRows ? team.currentPredictedScore : team.predictedScore}
@@ -206,7 +206,10 @@ export default function PlayersTable({ players, team, showStats }: Props) {
           </tr>
           {showTwoFooterRows && (
             <tr>
-              <td colSpan={visibleLeadingCols} className="px-2 py-1 text-right">Pre-game</td>
+              <td className="px-2 py-1" />
+              <td className="px-2 py-1" />
+              <td className="px-2 py-1 text-right">Pre-game</td>
+              {STAT_KEYS.slice(0, 10).map(k => <td key={k} className={colClass(true)} />)}
               <td />
               <td className="px-2 py-1 text-right">{team.predictedScore}</td>
               <td className={colClass(true)} />
