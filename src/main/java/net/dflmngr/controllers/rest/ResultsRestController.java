@@ -2,6 +2,8 @@ package net.dflmngr.controllers.rest;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +16,8 @@ import net.dflmngr.services.ResultService;
 @RestController
 public class ResultsRestController {
 
+	private static final Logger logger = LoggerFactory.getLogger(ResultsRestController.class);
+
 	private final ResultService resultService;
 
 	public ResultsRestController(ResultService resultService) {
@@ -22,17 +26,20 @@ public class ResultsRestController {
 
 	@GetMapping(value = "/results/{round}/{game}", produces = "application/json")
 	public Results getResults(@PathVariable int round, @PathVariable int game) {
+		logger.info("Getting results for round={} game={}", round, game);
 		return resultService.getResults(round, game);
 	}
 
 	@GetMapping(value = "/results", produces = "application/json")
 	public Results getCurrentResults() {
+		logger.info("Getting current results");
 		return resultService.getCurrentResults();
 	}
 
 	@GetMapping(value = "/results/menu", produces = "application/json")
 	public List<RoundMenu> getMenu(@RequestParam(required = false) Integer round,
 	                               @RequestParam(required = false) Integer game) {
+		logger.info("Getting results menu for round={} game={}", round, game);
 		if (round == null || game == null) {
 			Results current = resultService.getCurrentResults();
 			return resultService.getMenu(current.getRound(), current.getGame());
