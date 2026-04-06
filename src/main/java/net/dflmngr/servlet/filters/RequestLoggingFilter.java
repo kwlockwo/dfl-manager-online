@@ -24,7 +24,9 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String requestId = UUID.randomUUID().toString();
+        String requestId = request.getHeader("request-id") != null
+                ? request.getHeader("request-id")
+                : UUID.randomUUID().toString();
         long start = System.currentTimeMillis();
         CountingResponseWrapper wrapper = new CountingResponseWrapper(response);
         try {
