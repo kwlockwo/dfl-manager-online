@@ -147,7 +147,8 @@ public class ResultService {
 		globalsPK.setCode("currentRound");
 		globalsPK.setGroupCode("dflRef");
 		
-		Globals currentRoundGlobal = globalsRespository.findById(globalsPK).orElseThrow();
+		Globals currentRoundGlobal = globalsRespository.findById(globalsPK)
+				.orElseThrow(() -> new NoSuchElementException("Global config not found: code=currentRound groupCode=dflRef"));
 		int currentRound = Integer.parseInt(currentRoundGlobal.getValue());
 		return getResults(currentRound, 1);
 
@@ -224,7 +225,8 @@ public class ResultService {
 		TeamResults teamResults = new TeamResults();
 
 		if(teamCode != null) {
-			DflTeam team = dflTeamRepository.findById(teamCode).orElseThrow();
+			DflTeam team = dflTeamRepository.findById(teamCode)
+					.orElseThrow(() -> new NoSuchElementException("Team not found: teamCode=" + teamCode));
 			teamResults.setTeamCode(teamCode);
 			teamResults.setTeamName(team.getName());
 
@@ -247,7 +249,8 @@ public class ResultService {
 			DflTeamPredictedScoresPK dflTeamPredictedScoresPK = new DflTeamPredictedScoresPK();
 			dflTeamPredictedScoresPK.setRound(round);
 			dflTeamPredictedScoresPK.setTeamCode(teamCode);
-			DflTeamPredictedScores dflTeamPredictedScore = dflTeamPredictedScoresRepository.findById(dflTeamPredictedScoresPK).orElseThrow();
+			DflTeamPredictedScores dflTeamPredictedScore = dflTeamPredictedScoresRepository.findById(dflTeamPredictedScoresPK)
+					.orElseThrow(() -> new NoSuchElementException("Predicted scores not found: round=" + round + " teamCode=" + teamCode));
 
 			if(dflTeamScore != null) {
 				teamResults.setScore(dflTeamScore.getScore());

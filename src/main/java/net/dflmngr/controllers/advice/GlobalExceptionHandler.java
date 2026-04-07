@@ -1,4 +1,4 @@
-package net.dflmngr.controllers.rest;
+package net.dflmngr.controllers.advice;
 
 import java.util.Map;
 import java.util.NoSuchElementException;

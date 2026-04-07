@@ -1,4 +1,4 @@
-package net.dflmngr.controllers.rest;
+package net.dflmngr.controllers.advice;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
