@@ -58,12 +58,12 @@ public class ResultService {
 	private final DflPlayerPredictedScoresRepository dflPlayerPredictedScoresRepository;
 	private final DflTeamScoresRepository dflTeamScoresRepository;
 	private final DflTeamPredictedScoresRepository dflTeamPredictedScoresRepository;
-	private final GlobalsRepository globalsRespository;
+	private final GlobalsRepository globalsRepository;
 	
 	public ResultService(DflFixtureRepository dflFixtureRepository, DflTeamRepository dflTeamRepository, DflPlayerRepository dflPlayerRepository, AflPlayerRepository aflPlayerRepository,
 			             DflSelectedPlayerRepository dflSelectedPlayerRepository, RawPlayerStatsRepository rawPlayerStatsRepository, DflPlayerScoresRepository dflPlayerScoresRepository,
 			             DflPlayerPredictedScoresRepository dflPlayerPredictedScoresRepository, DflTeamScoresRepository dflTeamScoresRepository,
-			             DflTeamPredictedScoresRepository dflTeamPredictedScoresRepository, GlobalsRepository globalsRespository) {
+			             DflTeamPredictedScoresRepository dflTeamPredictedScoresRepository, GlobalsRepository globalsRepository) {
 		this.dflFixtureRepository = dflFixtureRepository;
 		this.dflTeamRepository = dflTeamRepository;
 		this.dflPlayerRepository = dflPlayerRepository;
@@ -74,7 +74,7 @@ public class ResultService {
 		this.dflPlayerPredictedScoresRepository = dflPlayerPredictedScoresRepository;
 		this.dflTeamScoresRepository = dflTeamScoresRepository;
 		this.dflTeamPredictedScoresRepository = dflTeamPredictedScoresRepository;
-		this.globalsRespository = globalsRespository;
+		this.globalsRepository = globalsRepository;
 	}
 	
 	public Results getResults(int round, int game) {
@@ -147,7 +147,7 @@ public class ResultService {
 		globalsPK.setCode("currentRound");
 		globalsPK.setGroupCode("dflRef");
 		
-		Globals currentRoundGlobal = globalsRespository.findById(globalsPK)
+		Globals currentRoundGlobal = globalsRepository.findById(globalsPK)
 				.orElseThrow(() -> new NoSuchElementException("Global config not found: code=currentRound groupCode=dflRef"));
 		int currentRound = Integer.parseInt(currentRoundGlobal.getValue());
 		return getResults(currentRound, 1);
